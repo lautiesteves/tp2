@@ -1,26 +1,30 @@
+import requests
+
 def main() -> None:
     print("Jugársela")
     #Login
-    usuario: dict = iniciarSesion()
+    #usuario: dict = iniciarSesion()
     #Menu
     opcion: str = ingresarOpcion()
     while opcion != 'i':
         if(opcion == 'a'):
-            mostrarPlantel()
-        if(opcion == 'b'):
+            MostrarPlantel()
+            input("Enter para continuar")
+        elif(opcion == 'b'):
             mostrarTabla()
-        if(opcion == 'c'):
+        elif(opcion == 'c'):
             mostrarEstadioYEscudo()
-        if(opcion == 'd'):
+        elif(opcion == 'd'):
             mostrarGraficoDeGoles()
-        if(opcion == 'e'):
+        elif(opcion == 'e'):
             cargarDinero()
-        if(opcion == 'f'):
+        elif(opcion == 'f'):
             mostrarUsuarioQueMasAposto()
-        if(opcion == 'g'):
+        elif(opcion == 'g'):
             mostrarUsuarioQueMasGano()
-        if(opcion == 'h'):
+        elif(opcion == 'h'):
             apostar()
+        opcion: str = ingresarOpcion()
 
 def imprimirOpciones() -> None:
     print("-"*15)
@@ -45,5 +49,26 @@ def ingresarOpcion() -> str:
     while not validarOpcion(opcion):
         opcion = input(f"'{opcion}' no es una opción válida. Por favor seleccione una opción válida: ")
     return opcion
+
+def MostrarPlantel():
+    lista_equipos_ids = [451, 434, 435, 436, 437, 438, 439, 440, 441, 442, 445, 446, 448, 449, 450, 452, 453, 455, 456, 457, 458, 459, 460, 474, 478, 1064, 4065, 2434]
+    lista_equipos = ["Boca JRS", "Gimnasia (LP)", "River Plate", "Racing Club", "Rosario Central", "Vélez Sarsfield", "Godoy cruz", "Belgrano (Cba)", "Unión de Santa Fé", "Defensa y Justicia", "Huracán", "Lanús", "Colón de Santa Fé", "Banfield", "Estudiantes (LP)", "Tigre", "Independiente", "Atlético Tucumán", "Talleres (Cba)", "Newells Old Boys", "Argentinos JRS", "Arsenal de Sarandí", "San Lorenzo", "Sarmiento (J)", "Instituto (Cba)", "Platense", "Central Córdoba (SdE)", "Barracas Central"]
+    print("Equipos de la LPF:")
+    for i in range(len(lista_equipos)):
+        print(f"{i+1}. {lista_equipos[i]}")
+    print("-"*20)
+    equipo = int(input("Ingrese de que equipo desea buscar su plantel: "))
+
+    while equipo <= 0 or equipo > len(lista_equipos_ids):
+        equipo = int(input("Ingreso inválido. Seleccione uno nuevo: "))
+    id_equipo = lista_equipos_ids[equipo-1]
+    headers = {'x-rapidapi-host': "v3.football.api-sports.io", 'x-rapidapi-key': "06a1ef31a4553ae29d102396d964a20f"}
+    params ={"league":"128", "season": 2022, "team": id_equipo}
+    url = "https://v3.football.api-sports.io/players"
+    respuesta = requests.get(url, params=params, headers=headers).json()["response"]
+
+    for i in range(len(respuesta)):
+        print(respuesta[i]["player"]["name"])
+
 
 main()

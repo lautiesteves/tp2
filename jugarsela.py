@@ -176,6 +176,20 @@ def MostrarEstadioYEscudo(lista_equipos_ids, lista_equipos):
             print(respuesta[i]["venue"]["image"])  #Ver si se puede imprimir la foto del estadio en lugar de una url
             print("-"*40)
 
+def MostrarFixture():
+    numero_temporada = int(input("Ingrese numero de temporada para ver el fixture: "))
+    numero_fecha = int(input("Ingrese numero de fecha para ver el fixture: "))
+    headers = {'x-rapidapi-host': "v3.football.api-sports.io", 'x-rapidapi-key': "ef7e9b83b25359c08ef9f5135245bf8d"}
+    params ={"league":"128","season": numero_temporada, "round": f"1st Phase - {numero_fecha}"}
+    url = "https://v3.football.api-sports.io/fixtures"
+    respuesta = requests.get(url, params=params, headers=headers).json()["response"] #['fixture'],["league"]["round"], ['teams'][home or away]["id","name","logo","winner":bool]
+    print(f"Fixture de la fecha {numero_fecha}:")
+    print("-"20)
+    for i in range(14):
+        print(respuesta[i]["teams"]["home"]["name"], "VS", respuesta[i]["teams"]["away"]["name"])
+        print(respuesta[i]["goals"]["home"], "\t\t", respuesta[i]["goals"]["away"])
+    print("-"20)
+
 def obtenerUsuariosExistentes() -> dict:
     usuariosExistentes: dict = {}
     with open('usuarios.csv', newline='') as usuariosCsv:

@@ -93,7 +93,7 @@ def MostrarPlantel(lista_equipos_ids, lista_equipos) -> None:
     equipo = validador_num(input_num(), lista_opciones)
 
     id_equipo = lista_equipos_ids[equipo-1]
-    headers = {'x-rapidapi-host': "v3.football.api-sports.io", 'x-rapidapi-key': "06a1ef31a4553ae29d102396d964a20f"}
+    headers = {'x-rapidapi-host': "v3.football.api-sports.io", 'x-rapidapi-key': "ef7e9b83b25359c08ef9f5135245bf8d"}
     params ={"league":"128", "season": 2023, "team": id_equipo}
     url = "https://v3.football.api-sports.io/players"
     
@@ -122,7 +122,7 @@ def MostrarTabla() -> None:
     print("Ingrese el año de la temporada que desea conocer: ", end="")
     año_liga = int(validador_num(input_num(), años_ligas))
 
-    headers = {'x-rapidapi-host': "v3.football.api-sports.io", 'x-rapidapi-key': "06a1ef31a4553ae29d102396d964a20f"}
+    headers = {'x-rapidapi-host': "v3.football.api-sports.io", 'x-rapidapi-key': "ef7e9b83b25359c08ef9f5135245bf8d"}
     params = {"league":"128", "season": año_liga}
     url = "https://v3.football.api-sports.io/standings"
     respuesta = requests.get(url, params=params, headers=headers).json()["response"][0]["league"]["standings"][0]
@@ -156,7 +156,7 @@ def MostrarEstadioYEscudo(lista_equipos_ids, lista_equipos):
     equipo_a_buscar = validador_num(input_num(), lista_opciones)
 
     id_equipo_a_buscar = lista_equipos_ids[equipo_a_buscar-1]
-    headers = {'x-rapidapi-host': "v3.football.api-sports.io", 'x-rapidapi-key': "06a1ef31a4553ae29d102396d964a20f"}
+    headers = {'x-rapidapi-host': "v3.football.api-sports.io", 'x-rapidapi-key': "ef7e9b83b25359c08ef9f5135245bf8d"}
     params ={"league":"128","season": 2023}
     url = "https://v3.football.api-sports.io/teams"
 
@@ -200,7 +200,7 @@ def validarEmail(email) -> bool:
     return True
 
 #Asume que no existe un Usuario con el email
-def crearNuevoUsuario(dataInicioSesion: list) -> dict:
+def crearNuevoUsuario(dataInicioSesion: list) -> None:
     usuariosExistentes: dict = obtenerUsuariosExistentes()
     print(usuariosExistentes)
     with open('usuarios.csv', 'w', newline='') as usuariosCsv:
@@ -254,7 +254,7 @@ def main() -> None:
     lista_equipos = ["Boca JRS", "Gimnasia (LP)", "River Plate", "Racing Club", "Rosario Central", "Vélez Sarsfield", "Godoy cruz", "Belgrano (Cba)", "Unión de Santa Fé", "Defensa y Justicia",
     "Huracán", "Lanús", "Colón de Santa Fé", "Banfield", "Estudiantes (LP)", "Tigre", "Independiente", "Atlético Tucumán", "Talleres (Cba)", "Newells Old Boys", "Argentinos JRS",
     "Arsenal de Sarandí", "San Lorenzo", "Sarmiento (J)", "Instituto (Cba)", "Platense", "Central Córdoba (SdE)", "Barracas Central"]
-        
+    
     print("--------Bienvenido a Jugársela--------")
     input("Pulse Enter para iniciar la aplicación")
     #Login

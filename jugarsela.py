@@ -1,5 +1,6 @@
 import requests
 import os
+import csv
 
 def input_num() -> int:
     """
@@ -175,6 +176,78 @@ def MostrarEstadioYEscudo(lista_equipos_ids, lista_equipos):
             print(respuesta[i]["venue"]["image"])  #Ver si se puede imprimir la foto del estadio en lugar de una url
             print("-"*40)
 
+def obtenerUsuariosExistentes() -> dict:
+    usuariosExistentes: dict = {}
+    with open('usuarios.csv', newline='') as usuariosCsv:
+        csvReader = csv.reader(usuariosCsv, delimiter = ",")
+        next(csvReader)
+        for row in csvReader:
+            usuariosExistentes[row[0]] = [row[1],row[2],row[3],row[4], row[5]]
+    return usuariosExistentes
+
+def pedirDataInicioSesion() -> list:
+    #Pido e-mail y contraseña.
+    email: str = input("Ingrese e-mail: ")
+    while not validarEmail(email):
+        email = input(f"'{email}' no es un e-mail válido. Ingrese otro: ")
+    contrasena: str = input("Ingrese su contraseña: ")
+    while contrasena == '':
+        contrasena = input("Ingrese su contraseña: ")
+    return [email, contrasena]
+
+# TO-DO
+def validarEmail(email) -> bool:
+    return True
+
+#Asume que no existe un Usuario con el email
+def crearNuevoUsuario(dataInicioSesion: list) -> dict:
+    usuariosExistentes: dict = obtenerUsuariosExistentes()
+    print(usuariosExistentes)
+    with open('usuarios.csv', 'w', newline='') as usuariosCsv:
+        csvWriter = csv.writer(usuariosCsv, delimiter = ",", quotechar = '"', quoting = csv.QUOTE_NONNUMERIC)
+        csvWriter.writerow(("ID Usuario", "Nombre Usuario", "Contraseña", "Dinero Apostado", "Fecha Última Apuesta", "Dinero Disponible"))
+        for id in usuariosExistentes:
+            csvWriter.writerow((id, usuariosExistentes[id][0], usuariosExistentes[id][1], usuariosExistentes[id][2], usuariosExistentes[id][3], usuariosExistentes[id][4]))
+        csvWriter.writerow((dataInicioSesion[0], dataInicioSesion[2], dataInicioSesion[1], "0", "DDMMYYYY", "0"))
+
+#Asume que existe un Usuario con el email
+def obtenerUsuario(email: str) -> dict:
+    usuarios: dict = obtenerUsuariosExistentes()
+    for id in usuarios:
+        if email == id:
+            return {email: usuarios[id]}
+
+def crearUsuario() -> dict:
+    #Busco Usuarios existentes
+    usuariosExistentes: dict = obtenerUsuariosExistentes()
+    #Pido usuario y contraseña
+    dataInicioSesion: list = pedirDataInicioSesion()
+    #Ver que no exista
+    while dataInicioSesion[0] in usuariosExistentes.keys():
+        print("El usuario ya existe. Intente con otro e-mail.")
+        dataInicioSesion = pedirDataInicioSesion()
+    #Pido nombre de usuario
+    nombreDeUsuario: str = input("Ingrese su nombre de usuario: ")
+    while nombreDeUsuario == "":
+        nombreDeUsuario = input("Ingrese su nombre de usuario: ")
+    dataInicioSesion.append(nombreDeUsuario)
+    #Guardar Usuario en usuarios.csv
+    crearNuevoUsuario(dataInicioSesion)
+    return obtenerUsuario(dataInicioSesion[0])
+
+def iniciarSesion() -> dict:
+    opcionesValidas: list = ['a', 'b']
+    print("a. Iniciar sesión.")
+    print("b. Crear nuevo usuario.")
+    opcion: str = input("Ingrese opción deseada: ")
+    while opcion not in opcionesValidas:
+        opcion = input("Ingrese una opción válida: ")
+    if(opcion == 'a'):
+        usuario: dict = ingresarUsuario()
+    if(opcion == 'b'):
+        usuario: dict = crearUsuario()
+    return usuario
+
 
 def main() -> None:
     lista_equipos_ids = [451, 434, 435, 436, 437, 438, 439, 440, 441, 442, 445, 446, 448, 449, 450, 452, 453, 455, 456, 457, 458, 459, 460, 474, 478, 1064, 4065, 2434]
@@ -185,7 +258,7 @@ def main() -> None:
     print("--------Bienvenido a Jugársela--------")
     input("Pulse Enter para iniciar la aplicación")
     #Login
-    #usuario: dict = iniciarSesion()
+    usuario: dict = iniciarSesion()
     
     menu_principal()
     print("Ingrese una opción del menú: ", end="")

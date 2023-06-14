@@ -184,11 +184,11 @@ def MostrarFixture():
     url = "https://v3.football.api-sports.io/fixtures"
     respuesta = requests.get(url, params=params, headers=headers).json()["response"] #['fixture'],["league"]["round"], ['teams'][home or away]["id","name","logo","winner":bool]
     print(f"Fixture de la fecha {numero_fecha}:")
-    print("-"20)
+    print("-"*20)
     for i in range(14):
         print(respuesta[i]["teams"]["home"]["name"], "VS", respuesta[i]["teams"]["away"]["name"])
         print(respuesta[i]["goals"]["home"], "\t\t", respuesta[i]["goals"]["away"])
-    print("-"20)
+    print("-"*20)
 
 def obtenerUsuariosExistentes() -> dict:
     usuariosExistentes: dict = {}

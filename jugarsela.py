@@ -1,6 +1,7 @@
 import requests
 import os
 import csv
+import matplotlib.pyplot as plt
 
 def input_num() -> int:
     """
@@ -189,6 +190,55 @@ def MostrarFixture():
         print(respuesta[i]["teams"]["home"]["name"], "VS", respuesta[i]["teams"]["away"]["name"])
         print(respuesta[i]["goals"]["home"], "\t\t", respuesta[i]["goals"]["away"])
     print("-"*20)
+
+def mostrarGraficosDeGoles():
+    lista_equipos_ids = [451, 434, 435, 436, 437, 438, 439, 440, 441, 442, 445, 446, 448, 449, 450, 452, 453, 455, 456, 457, 458, 459, 460, 474, 478, 1064, 4065, 2434]
+    lista_equipos = ["Boca JRS", "Gimnasia (LP)", "River Plate", "Racing Club", "Rosario Central", "Vélez Sarsfield", "Godoy cruz", "Belgrano (Cba)", "Unión de Santa Fé", "Defensa y Justicia",
+    "Huracán", "Lanús", "Colón de Santa Fé", "Banfield", "Estudiantes (LP)", "Tigre", "Independiente", "Atlético Tucumán", "Talleres (Cba)", "Newells Old Boys", "Argentinos JRS",
+    "Arsenal de Sarandí", "San Lorenzo", "Sarmiento (J)", "Instituto (Cba)", "Platense", "Central Córdoba (SdE)", "Barracas Central"]
+    numero_temporada = int(input("Ingrese numero de temporada para ver el fixture: "))
+
+    lista_opciones = []
+    
+    print("Equipos de la Liga Profesional Argentina:")
+    for i in range(len(lista_equipos)):
+        lista_opciones.append(i+1)
+        print(f"{i+1}. {lista_equipos[i]}")
+    print("-"*20)
+    print("Ingrese de que equipo desea buscar sus estadísticas de goles: ", end="")
+    equipo = (validador_num(input_num(), lista_opciones))
+
+    id_equipo = (lista_equipos_ids[equipo-1])
+
+    headers = {'x-rapidapi-host': "v3.football.api-sports.io", 'x-rapidapi-key': "ef7e9b83b25359c08ef9f5135245bf8d"}
+    params ={"league":128,"season":numero_temporada,"team":id_equipo}
+    url = "https://v3.football.api-sports.io/teams/statistics"
+    respuesta = requests.get(url, params=params, headers=headers).json()["response"]["goals"]["for"]
+    numeros_porcentajes= []
+    porcentajes =[] #["0-15"],["16-30"],["31-45"],["46-60"],["61-75"],["76-90"],["91-105"],["106-120"] ej: ['31.58%', '10.53%', '10.53%', '15.79%', '10.53%', '15.79%', '5.26%', None]
+    porcentajes_str = ""
+    print("Goles a favor:", respuesta["total"]["total"])
+
+    for minutos in respuesta["minute"]:
+        porcentajes.append(respuesta["minute"][minutos]["percentage"])
+    for i in porcentajes:
+        porcentajes_str += str(i)
+    numeros_porcentajes = porcentajes_str.split("%")
+    for i in range(len(numeros_porcentajes)):
+        if numeros_porcentajes[i] == "None":
+            numeros_porcentajes[i] = "0"
+        numeros_porcentajes[i] = float(numeros_porcentajes[i])
+    print(numeros_porcentajes)
+
+    plt.figure(figsize=(12, 8))
+    x = ["Min 0 al 15", "Min 16 al 30", "Min 31 al 45", "Min 46 al 60", "Min 61 al 75", "Min 76 al 90", "Min 90 al 105", "Min 105 al 120"]
+    y = numeros_porcentajes
+    plt.xlabel("Minutos")
+    plt.ylabel("Porcentaje de goles")
+    plt.yticks(sorted(numeros_porcentajes))
+    plt.title("Porcentaje goles por minuto")
+    plt.bar(x,y, linewidth=2, edgecolor="black")
+    plt.show()
 
 def obtenerUsuariosExistentes() -> dict:
     usuariosExistentes: dict = {}

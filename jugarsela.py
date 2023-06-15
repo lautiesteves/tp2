@@ -121,7 +121,7 @@ def MostrarTabla() -> None:
         print(f" - {año}")
     print("-"*20)
     print("Ingrese el año de la temporada que desea conocer: ", end="")
-    año_liga = int(validador_num(input_num(), años_ligas))
+    año_liga = (validador_num(input_num(), años_ligas))
 
     headers = {'x-rapidapi-host': "v3.football.api-sports.io", 'x-rapidapi-key': "ef7e9b83b25359c08ef9f5135245bf8d"}
     params = {"league":"128", "season": año_liga}
@@ -191,15 +191,15 @@ def MostrarFixture():
         print(respuesta[i]["goals"]["home"], "\t\t", respuesta[i]["goals"]["away"])
     print("-"*20)
 
-def mostrarGraficosDeGoles():
-    lista_equipos_ids = [451, 434, 435, 436, 437, 438, 439, 440, 441, 442, 445, 446, 448, 449, 450, 452, 453, 455, 456, 457, 458, 459, 460, 474, 478, 1064, 4065, 2434]
-    lista_equipos = ["Boca JRS", "Gimnasia (LP)", "River Plate", "Racing Club", "Rosario Central", "Vélez Sarsfield", "Godoy cruz", "Belgrano (Cba)", "Unión de Santa Fé", "Defensa y Justicia",
-    "Huracán", "Lanús", "Colón de Santa Fé", "Banfield", "Estudiantes (LP)", "Tigre", "Independiente", "Atlético Tucumán", "Talleres (Cba)", "Newells Old Boys", "Argentinos JRS",
-    "Arsenal de Sarandí", "San Lorenzo", "Sarmiento (J)", "Instituto (Cba)", "Platense", "Central Córdoba (SdE)", "Barracas Central"]
-    numero_temporada = int(input("Ingrese numero de temporada para ver el fixture: "))
-
+def MostrarGraficoDeGoles(lista_equipos_ids, lista_equipos):
     lista_opciones = []
-    
+    años_ligas = [2015,2016,2017,2018,2019,2020,2021,2022,2023]
+    print("Temporadas de la Liga Profesional Argentina:")
+    for año in años_ligas:
+        print(f" - {año}")
+    print("-"*20)
+    print("Ingrese el año de la temporada que desea conocer: ", end="")
+    año_liga = (validador_num(input_num(), años_ligas))
     print("Equipos de la Liga Profesional Argentina:")
     for i in range(len(lista_equipos)):
         lista_opciones.append(i+1)
@@ -211,7 +211,7 @@ def mostrarGraficosDeGoles():
     id_equipo = (lista_equipos_ids[equipo-1])
 
     headers = {'x-rapidapi-host': "v3.football.api-sports.io", 'x-rapidapi-key': "ef7e9b83b25359c08ef9f5135245bf8d"}
-    params ={"league":128,"season":numero_temporada,"team":id_equipo}
+    params ={"league":128,"season":año_liga,"team":id_equipo}
     url = "https://v3.football.api-sports.io/teams/statistics"
     respuesta = requests.get(url, params=params, headers=headers).json()["response"]["goals"]["for"]
     numeros_porcentajes= []
@@ -223,7 +223,7 @@ def mostrarGraficosDeGoles():
         porcentajes.append(respuesta["minute"][minutos]["percentage"])
     for i in porcentajes:
         porcentajes_str += str(i)
-    numeros_porcentajes = porcentajes_str.split("%")
+    numeros_porcentajes = porcentajes_str.split("%")                                                        #Si a alguno se le ocurre mejor forma para sacar el "%" mejor
     for i in range(len(numeros_porcentajes)):
         if numeros_porcentajes[i] == "None":
             numeros_porcentajes[i] = "0"
@@ -322,7 +322,7 @@ def main() -> None:
     print("--------Bienvenido a Jugársela--------")
     input("Pulse Enter para iniciar la aplicación")
     #Login
-    usuario: dict = iniciarSesion()
+    #usuario: dict = iniciarSesion()
     
     menu_principal()
     print("Ingrese una opción del menú: ", end="")
@@ -339,7 +339,7 @@ def main() -> None:
             MostrarEstadioYEscudo(lista_equipos_ids, lista_equipos)
             input("Pulse enter para continuar.")
         elif(opcion == 'd'):
-            mostrarGraficoDeGoles()
+            MostrarGraficoDeGoles(lista_equipos_ids, lista_equipos)
         elif(opcion == 'e'):
             cargarDinero()
         elif(opcion == 'f'):

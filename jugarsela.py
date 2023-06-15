@@ -218,17 +218,17 @@ def MostrarGraficoDeGoles(lista_equipos_ids, lista_equipos):
     porcentajes =[] #["0-15"],["16-30"],["31-45"],["46-60"],["61-75"],["76-90"],["91-105"],["106-120"] ej: ['31.58%', '10.53%', '10.53%', '15.79%', '10.53%', '15.79%', '5.26%', None]
     porcentajes_str = ""
     print("Goles a favor:", respuesta["total"]["total"])
-
+    input("Presione enter para abrir el gráfico")
     for minutos in respuesta["minute"]:
         porcentajes.append(respuesta["minute"][minutos]["percentage"])
-    for i in porcentajes:
-        porcentajes_str += str(i)
-    numeros_porcentajes = porcentajes_str.split("%")                                                        #Si a alguno se le ocurre mejor forma para sacar el "%" mejor
+    for i in range(len(porcentajes)):
+        if type(porcentajes[i]) is not str:
+            porcentajes[i] = "0.00%"
+    porcentajes_str = " ".join(porcentajes)
+    porcentajes_str = porcentajes_str.replace("%", "")
+    numeros_porcentajes = porcentajes_str.split()
     for i in range(len(numeros_porcentajes)):
-        if numeros_porcentajes[i] == "None":
-            numeros_porcentajes[i] = "0"
         numeros_porcentajes[i] = float(numeros_porcentajes[i])
-    print(numeros_porcentajes)
 
     plt.figure(figsize=(12, 8))
     x = ["Min 0 al 15", "Min 16 al 30", "Min 31 al 45", "Min 46 al 60", "Min 61 al 75", "Min 76 al 90", "Min 90 al 105", "Min 105 al 120"]
@@ -236,7 +236,7 @@ def MostrarGraficoDeGoles(lista_equipos_ids, lista_equipos):
     plt.xlabel("Minutos")
     plt.ylabel("Porcentaje de goles")
     plt.yticks(sorted(numeros_porcentajes))
-    plt.title("Porcentaje goles por minuto")
+    plt.title("PORCENTAJE GOLES A FAVOR\n TOTAL DE GOLES EN LA TEMPORADA {}: {}".format(año_liga, respuesta["total"]["total"]))
     plt.bar(x,y, linewidth=2, edgecolor="black")
     plt.show()
 

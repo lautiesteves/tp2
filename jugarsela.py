@@ -322,7 +322,7 @@ def main() -> None:
     print("--------Bienvenido a Jugársela--------")
     input("Pulse Enter para iniciar la aplicación")
     #Login
-    #usuario: dict = iniciarSesion()
+    usuario: dict = iniciarSesion()
     
     menu_principal()
     print("Ingrese una opción del menú: ", end="")

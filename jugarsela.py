@@ -240,16 +240,16 @@ def MostrarGraficoDeGoles(lista_equipos_ids, lista_equipos):
     plt.bar(x,y, linewidth=2, edgecolor="black")
     plt.show()
 
-def obtenerUsuariosExistentes() -> dict:
-    usuariosExistentes: dict = {}
+def obtener_usuarios_existentes() -> dict:
+    usuarios_existentes: dict = {}
     with open('usuarios.csv', newline='') as usuariosCsv:
         csvReader = csv.reader(usuariosCsv, delimiter = ",")
         next(csvReader)
         for row in csvReader:
-            usuariosExistentes[row[0]] = [row[1],row[2],row[3],row[4], row[5]]
-    return usuariosExistentes
+            usuarios_existentes[row[0]] = [row[1],row[2],row[3],row[4], row[5]]
+    return usuarios_existentes
 
-def pedirDataInicioSesion() -> list:
+def pedir_data_inicio_sesion() -> list:
     #Pido e-mail y contraseña.
     email: str = input("Ingrese e-mail: ")
     while not validarEmail(email):
@@ -264,52 +264,52 @@ def validarEmail(email) -> bool:
     return True
 
 #Asume que no existe un Usuario con el email
-def crearNuevoUsuario(dataInicioSesion: list) -> None:
-    usuariosExistentes: dict = obtenerUsuariosExistentes()
-    print(usuariosExistentes)
+def crear_nuevo_usuario(data_inicio_sesion: list) -> None:
+    usuarios_existentes: dict = obtener_usuarios_existentes()
+    print(usuarios_existentes)
     with open('usuarios.csv', 'w', newline='') as usuariosCsv:
         csvWriter = csv.writer(usuariosCsv, delimiter = ",", quotechar = '"', quoting = csv.QUOTE_NONNUMERIC)
         csvWriter.writerow(("ID Usuario", "Nombre Usuario", "Contraseña", "Dinero Apostado", "Fecha Última Apuesta", "Dinero Disponible"))
-        for id in usuariosExistentes:
-            csvWriter.writerow((id, usuariosExistentes[id][0], usuariosExistentes[id][1], usuariosExistentes[id][2], usuariosExistentes[id][3], usuariosExistentes[id][4]))
-        csvWriter.writerow((dataInicioSesion[0], dataInicioSesion[2], dataInicioSesion[1], "0", "DDMMYYYY", "0"))
+        for id in usuarios_existentes:
+            csvWriter.writerow((id, usuarios_existentes[id][0], usuarios_existentes[id][1], usuarios_existentes[id][2], usuarios_existentes[id][3], usuarios_existentes[id][4]))
+        csvWriter.writerow((data_inicio_sesion[0], data_inicio_sesion[2], data_inicio_sesion[1], "0", "DDMMYYYY", "0"))
 
 #Asume que existe un Usuario con el email
-def obtenerUsuario(email: str) -> dict:
-    usuarios: dict = obtenerUsuariosExistentes()
+def obtener_usuario(email: str) -> dict:
+    usuarios: dict = obtener_usuarios_existentes()
     for id in usuarios:
         if email == id:
             return {email: usuarios[id]}
 
-def crearUsuario() -> dict:
+def crear_usuario() -> dict:
     #Busco Usuarios existentes
-    usuariosExistentes: dict = obtenerUsuariosExistentes()
+    usuarios_existentes: dict = obtener_usuarios_existentes()
     #Pido usuario y contraseña
-    dataInicioSesion: list = pedirDataInicioSesion()
+    data_inicio_sesion: list = pedir_data_inicio_sesion()
     #Ver que no exista
-    while dataInicioSesion[0] in usuariosExistentes.keys():
+    while data_inicio_sesion[0] in usuarios_existentes.keys():
         print("El usuario ya existe. Intente con otro e-mail.")
-        dataInicioSesion = pedirDataInicioSesion()
+        data_inicio_sesion = pedirDataInicioSesion()
     #Pido nombre de usuario
     nombreDeUsuario: str = input("Ingrese su nombre de usuario: ")
-    while nombreDeUsuario == "":
-        nombreDeUsuario = input("Ingrese su nombre de usuario: ")
-    dataInicioSesion.append(nombreDeUsuario)
+    while nombre_de_usuario == "":
+        nombre_de_usuario = input("Ingrese su nombre de usuario: ")
+    data_inicio_sesion.append(nombre_de_usuario)
     #Guardar Usuario en usuarios.csv
-    crearNuevoUsuario(dataInicioSesion)
-    return obtenerUsuario(dataInicioSesion[0])
+    crear_nuevo_usuario(data_inicio_sesion)
+    return obtener_usuario(data_inicio_sesion[0])
 
-def iniciarSesion() -> dict:
-    opcionesValidas: list = ['a', 'b']
+def iniciar_sesion() -> dict:
+    opciones_validas: list = ['a', 'b']
     print("a. Iniciar sesión.")
     print("b. Crear nuevo usuario.")
     opcion: str = input("Ingrese opción deseada: ")
-    while opcion not in opcionesValidas:
+    while opcion not in opciones_validas:
         opcion = input("Ingrese una opción válida: ")
     if(opcion == 'a'):
-        usuario: dict = ingresarUsuario()
+        usuario: dict = ingresar_usuario()
     if(opcion == 'b'):
-        usuario: dict = crearUsuario()
+        usuario: dict = crear_usuario()
     return usuario
 
 
@@ -322,7 +322,7 @@ def main() -> None:
     print("--------Bienvenido a Jugársela--------")
     input("Pulse Enter para iniciar la aplicación")
     #Login
-    usuario: dict = iniciarSesion()
+    usuario: dict = iniciar_sesion()
     
     menu_principal()
     print("Ingrese una opción del menú: ", end="")

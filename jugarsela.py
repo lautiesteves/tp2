@@ -4,6 +4,7 @@ import csv
 import matplotlib.pyplot as plt
 from passlib.hash import pbkdf2_sha256
 
+
 def input_num() -> int:
     """
     PRE: -
@@ -79,11 +80,13 @@ def posicion_jugador(pos:str) -> str:
     
     return pos
 
-def MostrarPlantel(lista_equipos_ids, lista_equipos) -> None:
+def MostrarPlantel(dicc_equipos:dict) -> None:
     """
     PRE: Ingresan una lista de los equipos de la LPA y otra lista con sus respectivos IDs. 
     POST: Imprime el plantel de jugadores del equipo que indique el usuario.
     """
+    lista_equipos_ids = [*dicc_equipos.keys()]
+    lista_equipos = [*dicc_equipos.values()]
     lista_opciones = []
     
     print("Equipos de la Liga Profesional Argentina:")
@@ -142,11 +145,13 @@ def MostrarTabla() -> None:
         print("{}. {}{}{}pts".format(equipo["rank"], equipo["team"]["name"], puntitos, equipo["points"]))
     print("-"*40)
 
-def MostrarEstadioYEscudo(lista_equipos_ids, lista_equipos):
+def MostrarEstadioYEscudo(dicc_equipos:dict):
     """
     PRE: Ingresan una lista de los equipos de la LPA y otra lista con sus respectivos IDs. 
     POST: Imprime información sobre el club que indique el usuario.
     """
+    lista_equipos_ids = [*dicc_equipos.keys()]
+    lista_equipos = [*dicc_equipos.values()]    
     lista_opciones = []
     
     print("Equipos de la Liga Profesional Argentina:")
@@ -175,7 +180,11 @@ def MostrarEstadioYEscudo(lista_equipos_ids, lista_equipos):
             if respuesta[i]["venue"]["surface"] == "grass": print("Superficie: Césped")
             print("Estadio:", respuesta[i]["venue"]["name"])
             print("Capacidad:", respuesta[i]["venue"]["capacity"], "espectadores")
-            print(respuesta[i]["venue"]["image"])  #Ver si se puede imprimir la foto del estadio en lugar de una url
+            
+            
+            urlimagen = respuesta[i]["venue"]["image"]  #Ver si se puede imprimir la foto del estadio en lugar de una url
+            estadio = Image.open(requests.get(urlimagen, stream=True).raw)
+            
             print("-"*40)
 
 def MostrarFixture():
@@ -191,8 +200,10 @@ def MostrarFixture():
         print(respuesta[i]["teams"]["home"]["name"], "VS", respuesta[i]["teams"]["away"]["name"])
         print(respuesta[i]["goals"]["home"], "\t\t", respuesta[i]["goals"]["away"])
     print("-"*20)
-
-def MostrarGraficoDeGoles(lista_equipos_ids, lista_equipos):
+s
+def MostrarGraficoDeGoles(dicc_equipos:dict):
+    lista_equipos_ids = [*dicc_equipos.keys()]
+    lista_equipos = [*dicc_equipos.values()]   
     lista_opciones = []
     años_ligas = [2015,2016,2017,2018,2019,2020,2021,2022,2023]
     print("Temporadas de la Liga Profesional Argentina:")
@@ -336,10 +347,10 @@ def verificar_contrasena(contrasena_encriptada: str, contrasena_ingresada:str) -
     return False
 
 def main() -> None:
-    lista_equipos_ids = [451, 434, 435, 436, 437, 438, 439, 440, 441, 442, 445, 446, 448, 449, 450, 452, 453, 455, 456, 457, 458, 459, 460, 474, 478, 1064, 4065, 2434]
-    lista_equipos = ["Boca JRS", "Gimnasia (LP)", "River Plate", "Racing Club", "Rosario Central", "Vélez Sarsfield", "Godoy cruz", "Belgrano (Cba)", "Unión de Santa Fé", "Defensa y Justicia",
-    "Huracán", "Lanús", "Colón de Santa Fé", "Banfield", "Estudiantes (LP)", "Tigre", "Independiente", "Atlético Tucumán", "Talleres (Cba)", "Newells Old Boys", "Argentinos JRS",
-    "Arsenal de Sarandí", "San Lorenzo", "Sarmiento (J)", "Instituto (Cba)", "Platense", "Central Córdoba (SdE)", "Barracas Central"]
+    diccionario_equipos = {451: 'Boca JRS', 434: 'Gimnasia (LP)', 435: 'River Plate', 436: 'Racing Club', 437: 'Rosario Central', 438: 'Vélez Sarsfield', 439: 'Godoy cruz',
+    440: 'Belgrano (Cba)', 441: 'Unión de Santa Fé', 442: 'Defensa y Justicia', 445: 'Huracán', 446: 'Lanús', 448: 'Colón de Santa Fé', 449: 'Banfield', 450: 'Estudiantes (LP)', 452: 'Tigre',
+    453: 'Independiente', 455: 'Atlético Tucumán', 456: 'Talleres (Cba)', 457: 'Newells Old Boys', 458: 'Argentinos JRS', 459: 'Arsenal de Sarandí', 460: 'San Lorenzo', 474: 'Sarmiento (J)',
+    478: 'Instituto (Cba)', 1064: 'Platense', 4065: 'Central Córdoba (SdE)', 2434: 'Barracas Central'}
     
     print("--------Bienvenido a Jugársela--------")
     input("Pulse Enter para iniciar la aplicación")
@@ -352,16 +363,17 @@ def main() -> None:
     while opcion != 'i':
         os.system("cls")
         if(opcion == 'a'):
-            MostrarPlantel(lista_equipos_ids, lista_equipos)
+            MostrarPlantel(diccionario_equipos)
             input("Pulse enter para continuar.")
         elif(opcion == 'b'):
             MostrarTabla()
             input("Pulse enter para continuar.")
         elif(opcion == 'c'):
-            MostrarEstadioYEscudo(lista_equipos_ids, lista_equipos)
+            MostrarEstadioYEscudo(diccionario_equipos)
             input("Pulse enter para continuar.")
         elif(opcion == 'd'):
-            MostrarGraficoDeGoles(lista_equipos_ids, lista_equipos)
+            MostrarGraficoDeGoles(diccionario_equipos)
+            input("Pulse enter para continuar.")
         elif(opcion == 'e'):
             cargarDinero()
         elif(opcion == 'f'):

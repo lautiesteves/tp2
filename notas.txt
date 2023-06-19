@@ -1,7 +1,15 @@
-CONTRASEÑAS
+----- CONTRASEÑAS -----
 
 prueba@gmail.com
 abc123
 
 prueba2@gmail.com
 xyz789
+
+-----  Lista Usuarios  -----
+
+usuarios[id][0] -> Nombre de Usuario
+usuarios[id][1] -> Contraseña 
+usuarios[id][2] -> Dinero Apostado
+usuarios[id][3] -> Fecha Última Apuesta
+usuarios[id][4] -> Dinero Disponible

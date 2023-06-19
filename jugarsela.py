@@ -395,18 +395,17 @@ def cargar_dinero(usuario: dict) -> None:
     print("Ingrese el dinero a cargar a su cuenta.")
     cantidad_a_cargar: int = input_num()
     usuarios_existentes: dict = obtener_usuarios_existentes()
-    print(usuario.keys())
     email: str = list(usuario.keys())[0]
     dinero_disponible = int(usuarios_existentes[email][4])
     usuarios_existentes[email][4] = str(dinero_disponible + cantidad_a_cargar)
     print(f"Carga exitosa! Ahora dispones de ${usuarios_existentes[email][4]}!")
     modificar_usuario(usuarios_existentes)
 
-def obtener_usuario(email: str) -> dict:
-    usuarios_existentes: dict = obtener_usuarios_existentes()
-    for id in usuarios_existentes:
-        if(id == email):
-            return usuarios_existentes[email]
+#def obtener_usuario(email: str) -> dict:
+ #   usuarios_existentes: dict = obtener_usuarios_existentes()
+  #  for id in usuarios_existentes:
+   #     if(id == email):
+    #        return usuarios_existentes[email]
 
 def iniciar_sesion() -> dict:
     print("-"*38)
@@ -489,7 +488,6 @@ def main() -> None:
     print("Saliste de la Aplicación")
 
 main()
-
 #mostrar_usuario_que_mas_aposto()
 
 #Prueba

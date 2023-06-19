@@ -18,7 +18,7 @@ def input_alfa() -> str:
     """
     PRE: -
     POST: Devuelve un valor alfabético, en minúsculas y sin tildes.
-    """
+    """     
     palabra = input("").lower()
     while palabra.isalpha() != True:
         palabra = input("El valor ingresado no es alfabético. Inténtelo nuevamente: ").lower()

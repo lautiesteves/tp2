@@ -336,10 +336,10 @@ def ingresar_usuario() -> dict:
     while not verificar_contrasena(usuarios_existentes[data_inicio_sesion[0]][1], data_inicio_sesion[1]):
         print("La contraseña ingresada es incorrecta.")
         data_inicio_sesion[1] = input("Intente nuevamente: ")
-    usuario: dict = usuarios_existentes[data_inicio_sesion[0]]
-    print(f"Bienvenido {usuario[0]}!")
-    print(f"Tienes ${usuario[4]} disponible.")
-    return obtener_usuario(data_inicio_sesion[0])
+    usuario: dict = {data_inicio_sesion[0]: usuarios_existentes[data_inicio_sesion[0]]}
+    print(f"Bienvenido {usuario[data_inicio_sesion[0]][0]}!")
+    print(f"Tienes ${usuario[data_inicio_sesion[0]][4]} disponible.")
+    return usuario
 
 def verificar_contrasena(contrasena_encriptada: str, contrasena_ingresada:str) -> bool:
     if(pbkdf2_sha256.verify(contrasena_ingresada, contrasena_encriptada)):
@@ -358,7 +358,10 @@ def cargar_dinero(usuario: dict) -> None:
     print("Ingrese el dinero a cargar a su cuenta.")
     cantidad_a_cargar: int = input_num()
     usuarios_existentes: dict = obtener_usuarios_existentes()
-    usuarios_existentes[usuario][4] += cantidad_a_cargar 
+    email: str = list(usuario.keys())[0]
+    dinero_disponible = int(usuarios_existentes[email][4])
+    usuarios_existentes[email][4] = dinero_disponible + cantidad_a_cargar
+    print(f"Carga exitosa! Ahora dispones de ${usuarios_existentes[email][4]}!")
     modificar_usuario(usuarios_existentes)
 
 def obtener_usuario(email: str) -> dict:

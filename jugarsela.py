@@ -144,7 +144,7 @@ def MostrarTabla() -> None:
         print("{}. {}{}{}pts".format(equipo["rank"], equipo["team"]["name"], puntitos, equipo["points"]))
     print("-"*40)
 
-def MostrarEstadioYEscudo(dicc_equipos):
+def MostrarEstadioYEscudo(dicc_equipos:dict):
     """
     PRE: Ingresan una lista de los equipos de la LPA y otra lista con sus respectivos IDs. 
     POST: Imprime información sobre el club que indique el usuario.
@@ -199,8 +199,10 @@ def MostrarFixture():
         print(respuesta[i]["teams"]["home"]["name"], "VS", respuesta[i]["teams"]["away"]["name"])
         print(respuesta[i]["goals"]["home"], "\t\t", respuesta[i]["goals"]["away"])
     print("-"*20)
-
-def MostrarGraficoDeGoles(lista_equipos_ids, lista_equipos):
+s
+def MostrarGraficoDeGoles(dicc_equipos:dict):
+    lista_equipos_ids = [*dicc_equipos.keys()]
+    lista_equipos = [*dicc_equipos.values()]   
     lista_opciones = []
     años_ligas = [2015,2016,2017,2018,2019,2020,2021,2022,2023]
     print("Temporadas de la Liga Profesional Argentina:")
@@ -348,7 +350,8 @@ def main() -> None:
             MostrarEstadioYEscudo(diccionario_equipos)
             input("Pulse enter para continuar.")
         elif(opcion == 'd'):
-            MostrarGraficoDeGoles(lista_equipos_ids, lista_equipos)
+            MostrarGraficoDeGoles(diccionario_equipos)
+            input("Pulse enter para continuar.")
         elif(opcion == 'e'):
             cargarDinero()
         elif(opcion == 'f'):

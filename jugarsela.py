@@ -125,7 +125,7 @@ def MostrarTabla() -> None:
         print(f" - {año}")
     print("-"*20)
     print("Ingrese el año de la temporada que desea conocer: ", end="")
-    año_liga = (validador_num(input_num(), años_ligas))
+    año_liga = int(validador_num(input_num(), años_ligas))
 
     headers = {'x-rapidapi-host': "v3.football.api-sports.io", 'x-rapidapi-key': "ef7e9b83b25359c08ef9f5135245bf8d"}
     params = {"league":"128", "season": año_liga}
@@ -200,7 +200,7 @@ def MostrarFixture():
         print(respuesta[i]["teams"]["home"]["name"], "VS", respuesta[i]["teams"]["away"]["name"])
         print(respuesta[i]["goals"]["home"], "\t\t", respuesta[i]["goals"]["away"])
     print("-"*20)
-s
+
 def MostrarGraficoDeGoles(dicc_equipos:dict):
     lista_equipos_ids = [*dicc_equipos.keys()]
     lista_equipos = [*dicc_equipos.values()]   
@@ -372,6 +372,7 @@ def main() -> None:
             MostrarEstadioYEscudo(diccionario_equipos)
             input("Pulse enter para continuar.")
         elif(opcion == 'd'):
+            mostrarGraficoDeGoles()
             MostrarGraficoDeGoles(diccionario_equipos)
             input("Pulse enter para continuar.")
         elif(opcion == 'e'):

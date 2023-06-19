@@ -395,9 +395,10 @@ def cargar_dinero(usuario: dict) -> None:
     print("Ingrese el dinero a cargar a su cuenta.")
     cantidad_a_cargar: int = input_num()
     usuarios_existentes: dict = obtener_usuarios_existentes()
+    print(usuario.keys())
     email: str = list(usuario.keys())[0]
     dinero_disponible = int(usuarios_existentes[email][4])
-    usuarios_existentes[email][4] = dinero_disponible + cantidad_a_cargar
+    usuarios_existentes[email][4] = str(dinero_disponible + cantidad_a_cargar)
     print(f"Carga exitosa! Ahora dispones de ${usuarios_existentes[email][4]}!")
     modificar_usuario(usuarios_existentes)
 
@@ -420,6 +421,28 @@ def iniciar_sesion() -> dict:
     if(opcion == 'b'):
         usuario: dict = crear_usuario()
     return usuario
+
+#Siempre va a haber al menos un usuario
+#Puede ser que todos los usuarios no hayan apostado (todos 0$)
+def mostrar_usuario_que_mas_aposto() -> None:
+    usuarios_existentes: dict = obtener_usuarios_existentes()
+    mayor_monto_apostado: int = 0
+    usuarios_que_mas_apostaron: dict = {}
+    for id in usuarios_existentes:
+        monto_apostado_usuario: int = int(usuarios_existentes[id][2])
+        if(monto_apostado_usuario > mayor_monto_apostado):
+            mayor_monto_apostado = monto_apostado_usuario
+            usuarios_que_mas_apostaron = {id: usuarios_existentes[id]}
+        elif(monto_apostado_usuario == mayor_monto_apostado):
+            usuarios_que_mas_apostaron = usuarios_que_mas_apostaron | usuarios_existentes[id]
+    print(usuarios_que_mas_apostaron)
+    if(mayor_monto_apostado == 0):
+        print("Todavia no se realizaron apuestas.")
+    else:
+        print("Usuarios con más apuestas:")
+        for id in usuarios_que_mas_apostaron:
+            print(id)
+            print(f"'{usuarios_que_mas_apostaron[id][0]}': ${usuarios_que_mas_apostaron[id][2]}")
 
 def main() -> None:
     diccionario_equipos = {451: 'Boca JRS', 434: 'Gimnasia (LP)', 435: 'River Plate', 436: 'Racing Club', 437: 'Rosario Central', 438: 'Vélez Sarsfield', 439: 'Godoy cruz',
@@ -453,7 +476,8 @@ def main() -> None:
             usuario = obtener_usuario(usuario.keys())
             input("Pulse enter para continuar.")
         elif(opcion == 'f'):
-            mostrarUsuarioQueMasAposto()
+            mostrar_usuario_que_mas_aposto()
+            input("Pulse enter para continuar.")
         elif(opcion == 'g'):
             mostrarUsuarioQueMasGano()
         elif(opcion == 'h'):
@@ -465,5 +489,7 @@ def main() -> None:
     print("Saliste de la Aplicación")
 
 main()
+
+#mostrar_usuario_que_mas_aposto()
 
 #Prueba

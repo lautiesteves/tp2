@@ -433,14 +433,12 @@ def mostrar_usuario_que_mas_aposto() -> None:
             mayor_monto_apostado = monto_apostado_usuario
             usuarios_que_mas_apostaron = {id: usuarios_existentes[id]}
         elif(monto_apostado_usuario == mayor_monto_apostado):
-            usuarios_que_mas_apostaron = usuarios_que_mas_apostaron | usuarios_existentes[id]
-    print(usuarios_que_mas_apostaron)
+            usuarios_que_mas_apostaron = usuarios_que_mas_apostaron | {id: usuarios_existentes[id]}
     if(mayor_monto_apostado == 0):
         print("Todavia no se realizaron apuestas.")
     else:
         print("Usuarios con más apuestas:")
         for id in usuarios_que_mas_apostaron:
-            print(id)
             print(f"'{usuarios_que_mas_apostaron[id][0]}': ${usuarios_que_mas_apostaron[id][2]}")
 
 def main() -> None:
@@ -488,6 +486,5 @@ def main() -> None:
     print("Saliste de la Aplicación")
 
 main()
-#mostrar_usuario_que_mas_aposto()
 
 #Prueba

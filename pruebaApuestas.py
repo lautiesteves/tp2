@@ -71,10 +71,10 @@ def MostrarFixture():
             print("------SEGUNDA FASE------")
             centena_fase = 200
     print("Escriba el número del partido en el cual quiere realizar su apuesta: ", end="")
-    opt = validador_num(input_num())
+    opt = input_num()
     while opt>40 or opt<1:
         print("Ingreso inválido. Ingrese uno de los numeros colocados entre las opciones antes mostradas: ", end="")
-        opt = validador_num(input_num())
+        opt = input_num()
     apuesta = input("En caso de querer apostar por el local ingrese 1, en caso de apostar por un empate ingrese 2, y en caso de apostar por el visitante ingrese 3 \n")
     #VALIDAR EL INGRESO DEL USUARIO
     print("Escriba la cantidad de dinero que desea apostar: ", end="")

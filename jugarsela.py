@@ -30,7 +30,7 @@ def validador_num(valor:int, valores:list) -> int:
     POST: Devuelve el entero solo cuando verifique que el mismo pertenezca a la lista.
     """
     while valor not in valores:
-        print(f"{valor} es una opción inválida. Inténtelo nuevamente: ", end="")
+        print(f"\"{valor}\" es una opción inválida. Inténtelo nuevamente: ", end="")
         valor = input_num()
     return valor
 
@@ -40,17 +40,32 @@ def validador_str(valor:str, valores:list) -> str:
     POST: Devuelve el string solo cuando verifique que el mismo pertenezca a la lista.
     """
     while valor not in valores:
-        print(f"{valor} es una opción inválida. Inténtelo nuevamente: ", end="")
+        print(f"\"{valor}\" es una opción inválida. Inténtelo nuevamente: ", end="")
         valor = input_alfa()
     return valor
 
-def menu_principal() -> None:
+def espacios_menu (nombre:str, dinero:str) -> int:
+    cantidad_espacios = 33 - len(nombre) - len(dinero)
+    
+    if cantidad_espacios > 0:
+        espacios = (" "*cantidad_espacios)
+    else:
+        espacios = ("\n")
+    
+    return espacios
+
+def menu_principal(usuario) -> None:
     """
     PRE: -
     POST: Imprime el menú principal de la aplicación.
     """
+    nombre = "MarianoRuenBladesMaldito"#[*usuario.values()][0][0]
+    dinero = "5236"#[*usuario.values()][0][4]
+    espacios = espacios_menu(nombre, dinero)
     os.system("cls")
-    print("Menú principal:")
+    print("------------ MENU PRINCIPAL ------------")
+    print(f"User: {nombre}{espacios}${dinero}")   #TO-DO: Agregar que mida el espacio entre "usuario" y "dinero", segun el "len()" de cada uno
+    print("-"*40)
     print("a. Mostrar plantel completo de un equipo (temporada 2023).")
     print("b. Mostrar tabla para una temporada.")
     print("c. Consultar estadio y escudo de un equipo.")
@@ -60,7 +75,7 @@ def menu_principal() -> None:
     print("g. Mostrar Usuario que más apuestas ganó.")
     print("h. Apostar.")
     print("i. Salir.")
-    print("-"*20)
+    print("-"*40)
 
 def posicion_jugador(pos:str) -> str:
     """
@@ -78,7 +93,7 @@ def posicion_jugador(pos:str) -> str:
     
     return pos
 
-def MostrarPlantel(dicc_equipos:dict) -> None:
+def mostrar_plantel(dicc_equipos:dict) -> None:
     """
     PRE: Ingresan una lista de los equipos de la LPA y otra lista con sus respectivos IDs. 
     POST: Imprime el plantel de jugadores del equipo que indique el usuario.
@@ -112,7 +127,7 @@ def MostrarPlantel(dicc_equipos:dict) -> None:
         print("{} {}{}{}".format(apellido[0], nombre[0], puntitos, posicion))
     print("-"*40)
 
-def MostrarTabla() -> None:
+def mostrar_tabla() -> None:
     """
     PRE: -
     POST: Imprime la tabla de posiciones de la LPA del año que indique el usuario.
@@ -143,7 +158,7 @@ def MostrarTabla() -> None:
         print("{}. {}{}{}pts".format(equipo["rank"], equipo["team"]["name"], puntitos, equipo["points"]))
     print("-"*40)
 
-def MostrarEstadioYEscudo(dicc_equipos:dict):
+def mostrar_estadio_y_escudo(dicc_equipos:dict):
     """
     PRE: Ingresan una lista de los equipos de la LPA y otra lista con sus respectivos IDs. 
     POST: Imprime información sobre el club que indique el usuario.
@@ -178,10 +193,8 @@ def MostrarEstadioYEscudo(dicc_equipos:dict):
             if respuesta[i]["venue"]["surface"] == "grass": print("Superficie: Césped")
             print("Estadio:", respuesta[i]["venue"]["name"])
             print("Capacidad:", respuesta[i]["venue"]["capacity"], "espectadores")
-            
-            
-            urlimagen = respuesta[i]["venue"]["image"]  #Ver si se puede imprimir la foto del estadio en lugar de una url
-            estadio = Image.open(requests.get(urlimagen, stream=True).raw)
+            #urlimagen = respuesta[i]["venue"]["image"]  #Ver si se puede imprimir la foto del estadio en lugar de una url
+            #estadio = Image.open(requests.get(urlimagen, stream=True).raw)
             
             print("-"*40)
 
@@ -199,7 +212,7 @@ def MostrarFixture():
         print(respuesta[i]["goals"]["home"], "\t\t", respuesta[i]["goals"]["away"])
     print("-"*20)
 
-def MostrarGraficoDeGoles(dicc_equipos:dict):
+def mostrar_grafico_goles(dicc_equipos:dict):
     lista_equipos_ids = [*dicc_equipos.keys()]
     lista_equipos = [*dicc_equipos.values()]   
     lista_opciones = []
@@ -250,8 +263,51 @@ def MostrarGraficoDeGoles(dicc_equipos:dict):
     plt.bar(x,y, linewidth=2, edgecolor="black")
     plt.show()
 
+<<<<<<< Updated upstream
 def obtenerUsuariosExistentes() -> dict:
     usuariosExistentes: dict = {}
+=======
+def mail_validado() -> str:
+    os.system("cls")
+    print("El mail debe cumplir las siguientes condiciones:\n - Formato: nombre_usuario@nombre_servicio_correo.com\n - \"nombre_usuario\" y \"nombre_servicio_correo\" no deben contener espacios ni\
+ caracteres especiales.\n - Ejemplo: Leonel@gmail.com")
+    print("-"*25)
+    mail = input("Ingrese un mail: ")
+    while len(mail) == 0:
+        mail = input("Ingrese un mail: ")
+
+    cantidad_puntos = mail.count(".")
+    mail_spliteado:list = mail.split("@")
+
+    if len(mail_spliteado) != 2:
+        print("El mail debe contener una única \"arroba\"(@) para separar usuario del servicio de correo electrónico")
+        input("Presione enter para intentarlo nuevamente.")
+        return mail_validado()
+    if cantidad_puntos != 1:
+        print("El mail debe contener un único \"punto\"(.) para poder finalizar con \".com\"")
+        input("Presione enter para intentarlo nuevamente.")
+        return mail_validado()
+    if mail_spliteado[1].count(".") == 0:
+        print("El \"punto\"(.) del mail debe estar después de la \"arroba\"(@)")
+        input("Presione enter para intentarlo nuevamente.")
+        return mail_validado()
+
+    usuario, correo, com  = mail_spliteado[0], mail_spliteado[1].split(".")[0], mail_spliteado[1].split(".")[1]
+    #condiciones (booleanos)
+    cond1 = usuario.isalnum()
+    cond2 = correo.isalnum()
+    cond3 = com == "com"
+
+    if cond1 != True or cond2 != True or cond3 != True:
+        print(f"{mail} es un mail inválido.")
+        input("Presione enter para intentarlo nuevamente.")
+        return mail_validado()
+
+    return mail
+
+def obtener_usuarios_existentes() -> dict:
+    usuarios_existentes: dict = {}
+>>>>>>> Stashed changes
     with open('usuarios.csv', newline='') as usuariosCsv:
         csvReader = csv.reader(usuariosCsv, delimiter = ",")
         next(csvReader)
@@ -261,17 +317,18 @@ def obtenerUsuariosExistentes() -> dict:
 
 def pedirDataInicioSesion() -> list:
     #Pido e-mail y contraseña.
-    email: str = input("Ingrese e-mail: ")
-    while not validarEmail(email):
-        email = input(f"'{email}' no es un e-mail válido. Ingrese otro: ")
+    email: str = mail_validado()
     contrasena: str = input("Ingrese su contraseña: ")
     while contrasena == '':
         contrasena = input("Ingrese su contraseña: ")
     return [email, contrasena]
 
-# TO-DO
-def validarEmail(email) -> bool:
-    return True
+#Asume que existe un Usuario con el email
+def obtener_usuario(email: str) -> dict:
+    usuarios: dict = obtener_usuarios_existentes()
+    for id in usuarios:
+        if email == id:
+            return {email: usuarios[id]}
 
 #Asume que no existe un Usuario con el email
 def crearNuevoUsuario(dataInicioSesion: list) -> None:
@@ -284,6 +341,7 @@ def crearNuevoUsuario(dataInicioSesion: list) -> None:
             csvWriter.writerow((id, usuariosExistentes[id][0], usuariosExistentes[id][1], usuariosExistentes[id][2], usuariosExistentes[id][3], usuariosExistentes[id][4]))
         csvWriter.writerow((dataInicioSesion[0], dataInicioSesion[2], dataInicioSesion[1], "0", "DDMMYYYY", "0"))
 
+<<<<<<< Updated upstream
 #Asume que existe un Usuario con el email
 def obtenerUsuario(email: str) -> dict:
     usuarios: dict = obtenerUsuariosExistentes()
@@ -292,6 +350,9 @@ def obtenerUsuario(email: str) -> dict:
             return {email: usuarios[id]}
 
 def crearUsuario() -> dict:
+=======
+def crear_usuario() -> dict:                 #TO-DO: Agregar pregunta al usuario, si el mail existe... desea loguearse con el mismo?.
+>>>>>>> Stashed changes
     #Busco Usuarios existentes
     usuariosExistentes: dict = obtenerUsuariosExistentes()
     #Pido usuario y contraseña
@@ -309,6 +370,7 @@ def crearUsuario() -> dict:
     crearNuevoUsuario(dataInicioSesion)
     return obtenerUsuario(dataInicioSesion[0])
 
+<<<<<<< Updated upstream
 def iniciarSesion() -> dict:
     opcionesValidas: list = ['a', 'b']
     print("a. Iniciar sesión.")
@@ -322,6 +384,47 @@ def iniciarSesion() -> dict:
         usuario: dict = crearUsuario()
     return usuario
 
+=======
+def verificar_contrasena(contrasena_encriptada: str, contrasena_ingresada:str) -> bool:
+    if(pbkdf2_sha256.verify(contrasena_ingresada, contrasena_encriptada)):
+        return True
+    return False
+
+def ingresar_usuario() -> dict:                 #TO-DO: Agregar opcion de dejar al usuario volver para atras para registrar un mail.
+    usuarios_existentes: dict = obtener_usuarios_existentes()
+    #Pido usuario y contraseña
+    data_inicio_sesion: list = pedir_data_inicio_sesion()
+    #Ver que exista
+    while data_inicio_sesion[0] not in usuarios_existentes.keys():
+        print("El usuario no existe. Intente con otro e-mail.")
+        data_inicio_sesion = pedir_data_inicio_sesion()
+    #Chequeo contraseña
+    while not verificar_contrasena(usuarios_existentes[data_inicio_sesion[0]][1], data_inicio_sesion[1]):
+        print("La contraseña ingresada es incorrecta.")
+        data_inicio_sesion[1] = input("Intente nuevamente: ")
+    usuario: dict = usuarios_existentes[data_inicio_sesion[0]]
+    
+    os.system("cls")
+    print(f"Bienvenido {usuario[0]}!")
+    print(f"Tienes ${usuario[4]} disponible.")
+    print("-"*20)
+    input("Pulsa enter para ingresar al menú.")
+    return obtener_usuario(data_inicio_sesion[0])
+
+def iniciar_sesion() -> dict:
+    print("-"*38)
+    print("a. Iniciar sesión.\nb. Crear nuevo usuario.")
+    print("-"*38)
+    print("Indique que desea hacer: ", end = "")
+    opcion: str = validador_str(input_alfa(), ["a","b"])
+    
+    os.system("cls")
+    if(opcion == 'a'):
+        usuario: dict = ingresar_usuario()
+    if(opcion == 'b'):
+        usuario: dict = crear_usuario()
+    return usuario
+>>>>>>> Stashed changes
 
 def main() -> None:
     diccionario_equipos = {451: 'Boca JRS', 434: 'Gimnasia (LP)', 435: 'River Plate', 436: 'Racing Club', 437: 'Rosario Central', 438: 'Vélez Sarsfield', 439: 'Godoy cruz',
@@ -334,23 +437,22 @@ def main() -> None:
     #Login
     """usuario: dict = iniciarSesion()"""
     
-    menu_principal()
+    menu_principal(usuario)
     print("Ingrese una opción del menú: ", end="")
     opcion = validador_str(input_alfa(), ["a","b","c","d","e","f","g","h","i"])
     while opcion != 'i':
         os.system("cls")
         if(opcion == 'a'):
-            MostrarPlantel(diccionario_equipos)
+            mostrar_plantel(diccionario_equipos)
             input("Pulse enter para continuar.")
         elif(opcion == 'b'):
-            MostrarTabla()
+            mostrar_tabla()
             input("Pulse enter para continuar.")
         elif(opcion == 'c'):
-            MostrarEstadioYEscudo(diccionario_equipos)
+            mostrar_estadio_y_escudo(diccionario_equipos)
             input("Pulse enter para continuar.")
         elif(opcion == 'd'):
-            mostrarGraficoDeGoles()
-            MostrarGraficoDeGoles(diccionario_equipos)
+            mostrar_grafico_goles(diccionario_equipos)
             input("Pulse enter para continuar.")
         elif(opcion == 'e'):
             cargarDinero()
@@ -361,7 +463,7 @@ def main() -> None:
         elif(opcion == 'h'):
             apostar()
         
-        menu_principal()
+        menu_principal(usuario)
         opcion = validador_str(input_alfa(), ["a","b","c","d","e","f","g","h","i"])
     
     print("Saliste de la Aplicación")

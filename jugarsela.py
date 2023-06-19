@@ -346,6 +346,21 @@ def verificar_contrasena(contrasena_encriptada: str, contrasena_ingresada:str) -
         return True
     return False
 
+#Recibe un dict con todos los usuarios actualizados
+def modificar_usuario(usuarios_actualizados: dict) -> None:
+    with open('usuarios.csv', 'w', newline='') as usuariosCsv:
+        csvWriter = csv.writer(usuariosCsv, delimiter = ",", quotechar = '"', quoting = csv.QUOTE_NONNUMERIC)
+        csvWriter.writerow(("ID Usuario", "Nombre Usuario", "Contraseña", "Dinero Apostado", "Fecha Última Apuesta", "Dinero Disponible"))
+        for id in usuarios_actualizados:
+            csvWriter.writerow((id, usuarios_actualizados[id][0], usuarios_actualizados[id][1], usuarios_actualizados[id][2], usuarios_actualizados[id][3], usuarios_actualizados[id][4]))
+
+def cargar_dinero(usuario: dict) -> None:
+    print("Ingrese el dinero a cargar a su cuenta.")
+    cantidad_a_cargar: int = input_num()
+    usuarios_existentes: dict = obtener_usuarios_existentes()
+    usuarios_existentes[usuario][4] += cantidad_a_cargar 
+    modificar_usuario(usuarios_existentes)
+
 def main() -> None:
     diccionario_equipos = {451: 'Boca JRS', 434: 'Gimnasia (LP)', 435: 'River Plate', 436: 'Racing Club', 437: 'Rosario Central', 438: 'Vélez Sarsfield', 439: 'Godoy cruz',
     440: 'Belgrano (Cba)', 441: 'Unión de Santa Fé', 442: 'Defensa y Justicia', 445: 'Huracán', 446: 'Lanús', 448: 'Colón de Santa Fé', 449: 'Banfield', 450: 'Estudiantes (LP)', 452: 'Tigre',
@@ -356,7 +371,6 @@ def main() -> None:
     input("Pulse Enter para iniciar la aplicación")
     #Login
     usuario: dict = iniciar_sesion()
-    
     menu_principal()
     print("Ingrese una opción del menú: ", end="")
     opcion = validador_str(input_alfa(), ["a","b","c","d","e","f","g","h","i"])
@@ -372,11 +386,11 @@ def main() -> None:
             MostrarEstadioYEscudo(diccionario_equipos)
             input("Pulse enter para continuar.")
         elif(opcion == 'd'):
-            mostrarGraficoDeGoles()
             MostrarGraficoDeGoles(diccionario_equipos)
             input("Pulse enter para continuar.")
         elif(opcion == 'e'):
-            cargarDinero()
+            cargar_dinero(usuario)
+            input("Pulse enter para continuar.")
         elif(opcion == 'f'):
             mostrarUsuarioQueMasAposto()
         elif(opcion == 'g'):

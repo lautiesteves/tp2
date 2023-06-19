@@ -143,7 +143,7 @@ def MostrarTabla() -> None:
         print("{}. {}{}{}pts".format(equipo["rank"], equipo["team"]["name"], puntitos, equipo["points"]))
     print("-"*40)
 
-def MostrarEstadioYEscudo(dicc_equipos):
+def MostrarEstadioYEscudo(dicc_equipos:dict):
     """
     PRE: Ingresan una lista de los equipos de la LPA y otra lista con sus respectivos IDs. 
     POST: Imprime información sobre el club que indique el usuario.
@@ -198,6 +198,57 @@ def MostrarFixture():
         print(respuesta[i]["teams"]["home"]["name"], "VS", respuesta[i]["teams"]["away"]["name"])
         print(respuesta[i]["goals"]["home"], "\t\t", respuesta[i]["goals"]["away"])
     print("-"*20)
+
+def MostrarGraficoDeGoles(dicc_equipos:dict):
+    lista_equipos_ids = [*dicc_equipos.keys()]
+    lista_equipos = [*dicc_equipos.values()]   
+    lista_opciones = []
+    años_ligas = [2015,2016,2017,2018,2019,2020,2021,2022,2023]
+    print("Temporadas de la Liga Profesional Argentina:")
+    for año in años_ligas:
+        print(f" - {año}")
+    print("-"*20)
+    print("Ingrese el año de la temporada que desea conocer: ", end="")
+    año_liga = (validador_num(input_num(), años_ligas))
+    print("Equipos de la Liga Profesional Argentina:")
+    for i in range(len(lista_equipos)):
+        lista_opciones.append(i+1)
+        print(f"{i+1}. {lista_equipos[i]}")
+    print("-"*20)
+    print("Ingrese de que equipo desea buscar sus estadísticas de goles: ", end="")
+    equipo = (validador_num(input_num(), lista_opciones))
+
+    id_equipo = (lista_equipos_ids[equipo-1])
+
+    headers = {'x-rapidapi-host': "v3.football.api-sports.io", 'x-rapidapi-key': "ef7e9b83b25359c08ef9f5135245bf8d"}
+    params ={"league":128,"season":año_liga,"team":id_equipo}
+    url = "https://v3.football.api-sports.io/teams/statistics"
+    respuesta = requests.get(url, params=params, headers=headers).json()["response"]["goals"]["for"]
+    numeros_porcentajes= []
+    porcentajes =[] #["0-15"],["16-30"],["31-45"],["46-60"],["61-75"],["76-90"],["91-105"],["106-120"] ej: ['31.58%', '10.53%', '10.53%', '15.79%', '10.53%', '15.79%', '5.26%', None]
+    porcentajes_str = ""
+    print("Goles a favor:", respuesta["total"]["total"])
+    input("Presione enter para abrir el gráfico")
+    for minutos in respuesta["minute"]:
+        porcentajes.append(respuesta["minute"][minutos]["percentage"])
+    for i in range(len(porcentajes)):
+        if type(porcentajes[i]) is not str:
+            porcentajes[i] = "0.00%"
+    porcentajes_str = " ".join(porcentajes)
+    porcentajes_str = porcentajes_str.replace("%", "")
+    numeros_porcentajes = porcentajes_str.split()
+    for i in range(len(numeros_porcentajes)):
+        numeros_porcentajes[i] = float(numeros_porcentajes[i])
+
+    plt.figure(figsize=(12, 8))
+    x = ["Min 0 al 15", "Min 16 al 30", "Min 31 al 45", "Min 46 al 60", "Min 61 al 75", "Min 76 al 90", "Min 90 al 105", "Min 105 al 120"]
+    y = numeros_porcentajes
+    plt.xlabel("Minutos")
+    plt.ylabel("Porcentaje de goles")
+    plt.yticks(sorted(numeros_porcentajes))
+    plt.title("PORCENTAJE GOLES A FAVOR\n TOTAL DE GOLES EN LA TEMPORADA {}: {}".format(año_liga, respuesta["total"]["total"]))
+    plt.bar(x,y, linewidth=2, edgecolor="black")
+    plt.show()
 
 def obtenerUsuariosExistentes() -> dict:
     usuariosExistentes: dict = {}
@@ -299,6 +350,8 @@ def main() -> None:
             input("Pulse enter para continuar.")
         elif(opcion == 'd'):
             mostrarGraficoDeGoles()
+            MostrarGraficoDeGoles(diccionario_equipos)
+            input("Pulse enter para continuar.")
         elif(opcion == 'e'):
             cargarDinero()
         elif(opcion == 'f'):

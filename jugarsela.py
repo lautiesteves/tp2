@@ -361,6 +361,12 @@ def cargar_dinero(usuario: dict) -> None:
     usuarios_existentes[usuario][4] += cantidad_a_cargar 
     modificar_usuario(usuarios_existentes)
 
+def obtener_usuario(email: str) -> dict:
+    usuarios_existentes: dict = obtener_usuarios_existentes()
+    for id in usuarios_existentes:
+        if(id == email):
+            return usuarios_existentes[email]
+
 def main() -> None:
     diccionario_equipos = {451: 'Boca JRS', 434: 'Gimnasia (LP)', 435: 'River Plate', 436: 'Racing Club', 437: 'Rosario Central', 438: 'Vélez Sarsfield', 439: 'Godoy cruz',
     440: 'Belgrano (Cba)', 441: 'Unión de Santa Fé', 442: 'Defensa y Justicia', 445: 'Huracán', 446: 'Lanús', 448: 'Colón de Santa Fé', 449: 'Banfield', 450: 'Estudiantes (LP)', 452: 'Tigre',
@@ -390,6 +396,7 @@ def main() -> None:
             input("Pulse enter para continuar.")
         elif(opcion == 'e'):
             cargar_dinero(usuario)
+            usuario = obtener_usuario(usuario.keys())
             input("Pulse enter para continuar.")
         elif(opcion == 'f'):
             mostrarUsuarioQueMasAposto()

@@ -1,4 +1,3 @@
 "ID Usuario","Nombre Usuario","Contraseña","Dinero Apostado","Fecha Última Apuesta","Dinero Disponible"
-"lautarito@gmail.com","LautiCARP","0000","400","11062023","350"
-"pedrito@gmail.com","Pedro456","0000","500","09062023","150"
-"maria@gmail.com","MariaXeneixe","0000","1500","05062023","320"
+"prueba@gmail.com","Prueba","$pbkdf2-sha256$29000$ZGxN6Z2zdi5lrPVeS6l1bg$Mq3DdwiQoYcOoZLHF.nYBb5vIMWs8dK3RqCE5zXiajQ","120","DDMMYYYY","100"
+"prueba2@gmail.com","Prueba2","$pbkdf2-sha256$29000$VGoN4fwfQwjBOEeI0bp3jg$mp0xf.G3tpnPPvi20hQLBQpsNlH4BivDeO.F7NNljb8","50","DDMMYYYY","230"

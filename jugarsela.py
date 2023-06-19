@@ -2,6 +2,7 @@ import requests
 import os
 import csv
 import matplotlib.pyplot as plt
+from passlib.hash import pbkdf2_sha256
 
 def input_num() -> int:
     """
@@ -266,13 +267,13 @@ def validarEmail(email) -> bool:
 #Asume que no existe un Usuario con el email
 def crear_nuevo_usuario(data_inicio_sesion: list) -> None:
     usuarios_existentes: dict = obtener_usuarios_existentes()
-    print(usuarios_existentes)
+    contrasena_encriptada: str = pbkdf2_sha256.hash(data_inicio_sesion[1])
     with open('usuarios.csv', 'w', newline='') as usuariosCsv:
         csvWriter = csv.writer(usuariosCsv, delimiter = ",", quotechar = '"', quoting = csv.QUOTE_NONNUMERIC)
         csvWriter.writerow(("ID Usuario", "Nombre Usuario", "Contraseña", "Dinero Apostado", "Fecha Última Apuesta", "Dinero Disponible"))
         for id in usuarios_existentes:
             csvWriter.writerow((id, usuarios_existentes[id][0], usuarios_existentes[id][1], usuarios_existentes[id][2], usuarios_existentes[id][3], usuarios_existentes[id][4]))
-        csvWriter.writerow((data_inicio_sesion[0], data_inicio_sesion[2], data_inicio_sesion[1], "0", "DDMMYYYY", "0"))
+        csvWriter.writerow((data_inicio_sesion[0], data_inicio_sesion[2], contrasena_encriptada, "0", "DDMMYYYY", "0"))
 
 #Asume que existe un Usuario con el email
 def obtener_usuario(email: str) -> dict:
@@ -289,9 +290,9 @@ def crear_usuario() -> dict:
     #Ver que no exista
     while data_inicio_sesion[0] in usuarios_existentes.keys():
         print("El usuario ya existe. Intente con otro e-mail.")
-        data_inicio_sesion = pedirDataInicioSesion()
+        data_inicio_sesion = pedir_data_inicio_sesion()
     #Pido nombre de usuario
-    nombreDeUsuario: str = input("Ingrese su nombre de usuario: ")
+    nombre_de_usuario: str = input("Ingrese su nombre de usuario: ")
     while nombre_de_usuario == "":
         nombre_de_usuario = input("Ingrese su nombre de usuario: ")
     data_inicio_sesion.append(nombre_de_usuario)
@@ -312,6 +313,27 @@ def iniciar_sesion() -> dict:
         usuario: dict = crear_usuario()
     return usuario
 
+def ingresar_usuario() -> dict:
+    usuarios_existentes: dict = obtener_usuarios_existentes()
+    #Pido usuario y contraseña
+    data_inicio_sesion: list = pedir_data_inicio_sesion()
+    #Ver que exista
+    while data_inicio_sesion[0] not in usuarios_existentes.keys():
+        print("El usuario no existe. Intente con otro e-mail.")
+        data_inicio_sesion = pedir_data_inicio_sesion()
+    #Chequeo contraseña
+    while not verificar_contrasena(usuarios_existentes[data_inicio_sesion[0]][1], data_inicio_sesion[1]):
+        print("La contraseña ingresada es incorrecta.")
+        data_inicio_sesion[1] = input("Intente nuevamente: ")
+    usuario: dict = usuarios_existentes[data_inicio_sesion[0]]
+    print(f"Bienvenido {usuario[0]}!")
+    print(f"Tienes ${usuario[4]} disponible.")
+    return obtener_usuario(data_inicio_sesion[0])
+
+def verificar_contrasena(contrasena_encriptada: str, contrasena_ingresada:str) -> bool:
+    if(pbkdf2_sha256.verify(contrasena_ingresada, contrasena_encriptada)):
+        return True
+    return False
 
 def main() -> None:
     lista_equipos_ids = [451, 434, 435, 436, 437, 438, 439, 440, 441, 442, 445, 446, 448, 449, 450, 452, 453, 455, 456, 457, 458, 459, 460, 474, 478, 1064, 4065, 2434]

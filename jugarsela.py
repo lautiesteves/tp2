@@ -263,10 +263,6 @@ def mostrar_grafico_goles(dicc_equipos:dict):
     plt.bar(x,y, linewidth=2, edgecolor="black")
     plt.show()
 
-<<<<<<< Updated upstream
-def obtenerUsuariosExistentes() -> dict:
-    usuariosExistentes: dict = {}
-=======
 def mail_validado() -> str:
     os.system("cls")
     print("El mail debe cumplir las siguientes condiciones:\n - Formato: nombre_usuario@nombre_servicio_correo.com\n - \"nombre_usuario\" y \"nombre_servicio_correo\" no deben contener espacios ni\
@@ -307,7 +303,6 @@ def mail_validado() -> str:
 
 def obtener_usuarios_existentes() -> dict:
     usuarios_existentes: dict = {}
->>>>>>> Stashed changes
     with open('usuarios.csv', newline='') as usuariosCsv:
         csvReader = csv.reader(usuariosCsv, delimiter = ",")
         next(csvReader)
@@ -341,18 +336,7 @@ def crearNuevoUsuario(dataInicioSesion: list) -> None:
             csvWriter.writerow((id, usuariosExistentes[id][0], usuariosExistentes[id][1], usuariosExistentes[id][2], usuariosExistentes[id][3], usuariosExistentes[id][4]))
         csvWriter.writerow((dataInicioSesion[0], dataInicioSesion[2], dataInicioSesion[1], "0", "DDMMYYYY", "0"))
 
-<<<<<<< Updated upstream
-#Asume que existe un Usuario con el email
-def obtenerUsuario(email: str) -> dict:
-    usuarios: dict = obtenerUsuariosExistentes()
-    for id in usuarios:
-        if email == id:
-            return {email: usuarios[id]}
-
-def crearUsuario() -> dict:
-=======
 def crear_usuario() -> dict:                 #TO-DO: Agregar pregunta al usuario, si el mail existe... desea loguearse con el mismo?.
->>>>>>> Stashed changes
     #Busco Usuarios existentes
     usuariosExistentes: dict = obtenerUsuariosExistentes()
     #Pido usuario y contraseña
@@ -370,21 +354,6 @@ def crear_usuario() -> dict:                 #TO-DO: Agregar pregunta al usuario
     crearNuevoUsuario(dataInicioSesion)
     return obtenerUsuario(dataInicioSesion[0])
 
-<<<<<<< Updated upstream
-def iniciarSesion() -> dict:
-    opcionesValidas: list = ['a', 'b']
-    print("a. Iniciar sesión.")
-    print("b. Crear nuevo usuario.")
-    opcion: str = input("Ingrese opción deseada: ")
-    while opcion not in opcionesValidas:
-        opcion = input("Ingrese una opción válida: ")
-    if(opcion == 'a'):
-        usuario: dict = ingresarUsuario()
-    if(opcion == 'b'):
-        usuario: dict = crearUsuario()
-    return usuario
-
-=======
 def verificar_contrasena(contrasena_encriptada: str, contrasena_ingresada:str) -> bool:
     if(pbkdf2_sha256.verify(contrasena_ingresada, contrasena_encriptada)):
         return True

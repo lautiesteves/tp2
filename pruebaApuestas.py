@@ -70,7 +70,7 @@ def elije_partido(dinero_disponible_usuario, dicc_equipos, lista_partidos, id_eq
         partido_a_apostar = input_num()
         partido_a_apostar += centena_fase #Sumo 100 o 200 para saber a que fase quiere apostar el usuario y poder buscar el partido correcto (De ultima podemos sacar lo de las fases porque puede ser un quilombo)
     #Busca id del partido a apostar
-    id_partido = Busca_id_partido(lista_partidos, partido_a_apostar)
+    id_partido = busca_id_partido(lista_partidos, partido_a_apostar)
     #Pido a que equipo desea apostar
     print("En caso de querer apostar por el local ingrese 1, en caso de apostar por un empate ingrese 2, y en caso de apostar por el visitante ingrese 3 \n")
     apuesta = validador_num(input_num(), [1,2,3])

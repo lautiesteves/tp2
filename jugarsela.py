@@ -213,7 +213,10 @@ def mostrar_estadio_y_escudo(dicc_equipos:dict):
             
             print("-"*40)
 
-def MostrarFixture():
+"""  #Lo habia hecho antes pero no habia entendido bien lo que pedia el ejercicio. Lo dejo por si pinta usarlo
+     #Imprime los partidos de una fecha y una temporada ingresadas por el usuario
+
+def mostrar_fixture_fecha():
     numero_temporada = int(input("Ingrese numero de temporada para ver el fixture: "))
     numero_fecha = int(input("Ingrese numero de fecha para ver el fixture: "))
     headers = {'x-rapidapi-host': "v3.football.api-sports.io", 'x-rapidapi-key': "ef7e9b83b25359c08ef9f5135245bf8d"}
@@ -226,6 +229,7 @@ def MostrarFixture():
         print(respuesta[i]["teams"]["home"]["name"], "VS", respuesta[i]["teams"]["away"]["name"])
         print(respuesta[i]["goals"]["home"], "\t\t", respuesta[i]["goals"]["away"])
     print("-"*20)
+"""
 
 def mostrar_grafico_goles(dicc_equipos:dict):
     lista_equipos_ids = [*dicc_equipos.keys()]

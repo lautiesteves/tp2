@@ -391,9 +391,15 @@ def modificar_usuario(usuarios_actualizados: dict) -> None:
         for id in usuarios_actualizados:
             csvWriter.writerow((id, usuarios_actualizados[id][0], usuarios_actualizados[id][1], usuarios_actualizados[id][2], usuarios_actualizados[id][3], usuarios_actualizados[id][4]))
 
-def cargar_dinero(usuario: dict) -> None:
+def resolver_carga_dinero(usuario: dict) -> None:
     print("Ingrese el dinero a cargar a su cuenta.")
     cantidad_a_cargar: int = input_num()
+    while cantidad_a_cargar <= 0:
+        print("No se puede cargar la cantidad ingresada. Intente nuevamente.")
+        cantidad_a_cargar: int = input_num()
+    cargar_dinero(usuario, cantidad_a_cargar)
+    
+def cargar_dinero(usuario: dict, cantidad_a_cargar: int) -> None:
     usuarios_existentes: dict = obtener_usuarios_existentes()
     email: str = list(usuario.keys())[0]
     dinero_disponible = int(usuarios_existentes[email][4])
@@ -469,7 +475,7 @@ def main() -> None:
             mostrar_grafico_goles(diccionario_equipos)
             input("Pulse enter para continuar.")
         elif(opcion == 'e'):
-            cargar_dinero(usuario)
+            resolver_carga_dinero(usuario)
             usuario = obtener_usuario(usuario.keys())
             input("Pulse enter para continuar.")
         elif(opcion == 'f'):

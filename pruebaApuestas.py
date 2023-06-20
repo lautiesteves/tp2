@@ -1,6 +1,6 @@
 import random
 import requests
-
+import csv
 
 def validador_num(valor:int, valores:list) -> int:
     """
@@ -94,10 +94,8 @@ def busca_partido(dinero_disponible_usuario, dicc_equipos, lista_partidos, id_eq
     while dinero_apostado > dinero_disponible_usuario:
         print(f"No cuenta con esa cantidad de dinero en la cuenta. Su plata actual es {dinero_disponible_usuario}.\nIngresé su apuesta: ", end="")
         dinero_apostado = input_num()
-    if apuesta == 1: local = True
-    return dinero_apostado, local, id_partido
+    return dinero_apostado, apuesta, id_partido
     
-
 def Apuestas():
     dicc_equipos = {451: 'Boca JRS', 434: 'Gimnasia (LP)', 435: 'River Plate', 436: 'Racing Club', 437: 'Rosario Central', 438: 'Vélez Sarsfield', 439: 'Godoy cruz',
     440: 'Belgrano (Cba)', 441: 'Unión de Santa Fé', 442: 'Defensa y Justicia', 445: 'Huracán', 446: 'Lanús', 448: 'Colón de Santa Fé', 449: 'Banfield', 450: 'Estudiantes (LP)', 452: 'Tigre',
@@ -107,35 +105,79 @@ def Apuestas():
     dinero_disponible_usuario: float = float([*usuario.values()][0][4])
     lista_partidos, id_equipo = mostrar_fixture(dicc_equipos)
     print(id_equipo)
-    dinero_apostado, local_bool = busca_partido(dinero_disponible_usuario, dicc_equipos, lista_partidos, id_equipo)
+    dinero_apostado, apuesta = busca_partido(dinero_disponible_usuario, dicc_equipos, lista_partidos, id_equipo)
     #Buscar win or draw con el id del partido
-    FuncionPagaOQuita(dinero_disponible_usuario, dinero_apostado, local_bool, win_or_draw)
+    ganancia = resolver_apuesta(dinero_disponible_usuario, dinero_apostado, apuesta, win_or_draw)
+    cargar_dinero(usuario, ganancia)
 
 
-Apuestas()
-
-
-def FuncionPagaOQuita(billetera:float, plata_apostada:float, local:bool, win_or_draw:bool):   #No incluyo el partido porque entiendo que no nos interesa para saber cuanto gana, lo unico que nos interesa es saber si el win or draw es true y si se apuesta por el local
+#No incluyo el partido porque entiendo que no nos interesa para saber cuanto gana, lo unico que nos
+#interesa es saber si el win or draw es true y si se apuesta por el local
+def resolver_apuesta(dinero_disponible_usuario:float, dinero_apostado:float, apuesta:int, win_or_draw:bool):
+    #Dado simula resultado:
+    #1 -> Gana Local
+    #2 -> Empate
+    #3 -> Gana Visitante
     dado = random.randint(1,3)
-    ganancia = 3
-    if win_or_draw: ganancia = 0,3
+    #TO-DO Resolver cantidad ganancia con win_or_draw
+    multiplicador = 3
+    if win_or_draw: multiplicador = 0,3
+    #Dado == 2 da Empate
+    #Falta ver si se quita primero lo apostado y despues lo recupera o si se quita solo en caso de perder
     if dado == 2:
-        print(f"Ha habido un empate! Por lo que se añaden {plata_apostada*1.5}$ equivalentes a su apuesta mas su ganancia del 0.5 de lo que apostó")
-        billetera += plata_apostada*1.5                    #Falta ver si se quita primero lo apostado y despues lo recupera o si se quita solo en caso de perder
+        #Dado da Empate y se Aposto Empate
+        if apuesta == 2:
+            print(f"Felicitacioness!! La apuesta ha sido un exito, ya puede encontrar su ganancia de {dinero_apostado*multiplicador} además de recuperar los {plata_apostada}$ apostados previamente.")
+            dinero_disponible_usuario += dinero_apostado*multiplicador
+        #Dado da Empate y se Aposto otra cosa
+        else:
+            print("Lo sentimos. El partido terminó empatado por lo que lamentablemente no se recupera lo apostado")
+    #Dado == 1 da que Gana Local
     elif dado == 1:
-        if local:
-            print(f"Felicitacioness!! La apuesta ha sido un exito, ya puede encontrar su ganancia de {plata_apostada*ganancia} además de recuperar los {plata_apostada}$ apostados previamente.")
-            billetera += plata_apostada*ganancia
+        #Dado da Gana Local y se Aposto Gana Local
+        if apuesta == 1:
+            print(f"Felicitaciones!! Ganó (L)!! La apuesta ha sido un exito, ya puede encontrar su ganancia de {dinero_apostado*multiplicador} además de recuperar los {plata_apostada}$ apostados previamente.")
+            dinero_disponible_usuario += dinero_apostado*multiplicador
+        #Dado da gana Local y se Aposto otra cosa
         else:
             print("Lo sentimos. El ganador ha sido el local por lo que lamentablemente no se recupera lo apostado")
+    #Dado == 3 da que Gana Visitante
     elif dado == 3:
-        if not local:
-            print(f"Felicitacioness!! La apuesta ha sido un exito, ya puede encontrar su ganancia de {plata_apostada*ganancia} además de recuperar los {plata_apostada}$ apostados previamente.")
-            billetera += plata_apostada*ganancia
+        #Dado da gana V y se Aposto Gana V
+        if apuesta == 3:
+            print(f"Felicitacioness!! La apuesta ha sido un exito, ya puede encontrar su ganancia de {dinero_apostado*multiplicador} además de recuperar los {plata_apostada}$ apostados previamente.")
+            dinero_disponible_usuario += dinero_apostado*multiplicador
+        #Dado da gana V y se Aposto otra cosa
         else:
             print("Lo sentimos. El ganador ha sido el visitante por lo que lamentablemente no se recupera lo apostado")
+    return dinero_apostado*multiplicador
 
+#FUNCIONES QUE YA ESTAN EN JUGARSELA:PY
+def cargar_dinero(usuario: dict, cantidad_a_cargar: int) -> None:
+    usuarios_existentes: dict = obtener_usuarios_existentes()
+    email: str = list(usuario.keys())[0]
+    dinero_disponible = int(usuarios_existentes[email][4])
+    usuarios_existentes[email][4] = str(dinero_disponible + cantidad_a_cargar)
+    print(f"Carga exitosa! Ahora dispones de ${usuarios_existentes[email][4]}!")
+    modificar_usuario(usuarios_existentes)
 
+def modificar_usuario(usuarios_actualizados: dict) -> None:
+    with open('usuarios.csv', 'w', newline='') as usuariosCsv:
+        csvWriter = csv.writer(usuariosCsv, delimiter = ",", quotechar = '"', quoting = csv.QUOTE_NONNUMERIC)
+        csvWriter.writerow(("ID Usuario", "Nombre Usuario", "Contraseña", "Dinero Apostado", "Fecha Última Apuesta", "Dinero Disponible"))
+        for id in usuarios_actualizados:
+            csvWriter.writerow((id, usuarios_actualizados[id][0], usuarios_actualizados[id][1], usuarios_actualizados[id][2], usuarios_actualizados[id][3], usuarios_actualizados[id][4]))
+
+def obtener_usuarios_existentes() -> dict:
+    usuarios_existentes: dict = {}
+    with open('usuarios.csv', newline='') as usuariosCsv:
+        csvReader = csv.reader(usuariosCsv, delimiter = ",")
+        next(csvReader)
+        for row in csvReader:
+            usuarios_existentes[row[0]] = [row[1],row[2],row[3],row[4], row[5]]
+    return usuarios_existentes
+
+Apuestas()
 """def MostrarFixtureViejo():
     dicc_equipos = {451: 'Boca JRS', 434: 'Gimnasia (LP)', 435: 'River Plate', 436: 'Racing Club', 437: 'Rosario Central', 438: 'Vélez Sarsfield', 439: 'Godoy cruz',
     440: 'Belgrano (Cba)', 441: 'Unión de Santa Fé', 442: 'Defensa y Justicia', 445: 'Huracán', 446: 'Lanús', 448: 'Colón de Santa Fé', 449: 'Banfield', 450: 'Estudiantes (LP)', 452: 'Tigre',

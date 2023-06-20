@@ -14,7 +14,7 @@ def es_float(num) -> bool:
 def input_float() -> float:
     numero = input("")
     while not es_float(numero):
-        numero = input("El valor ingresado debe ser un número. Inténtelo nuevamente: ")
+        numero = input("El valor ingresado debe ser un número. Inténtelo nuevamente.\n$ ")
     numero = float(numero)
     return numero
 
@@ -74,8 +74,8 @@ def menu_principal(usuario) -> None:
     PRE: -
     POST: Imprime el menú principal de la aplicación.
     """
-    nombre = "MarianoRuenBladesMaldito"#[*usuario.values()][0][0]
-    dinero = "5236"#[*usuario.values()][0][4]
+    nombre = [*usuario.values()][0][0]
+    dinero = [*usuario.values()][0][4]
     espacios = espacios_menu(nombre, dinero)
     os.system("cls")
     print("------------ MENU PRINCIPAL ------------")
@@ -134,6 +134,7 @@ def mostrar_plantel(dicc_equipos:dict) -> None:
     os.system("cls")
     
     print(f"Plantel de {lista_equipos[equipo-1]}:")
+    print("-"*40)
     for i in range(len(respuesta)):
         apellido = (respuesta[i]["player"]["lastname"]).split()
         nombre = (respuesta[i]["player"]["firstname"]).split()
@@ -148,10 +149,11 @@ def mostrar_tabla() -> None:
     POST: Imprime la tabla de posiciones de la LPA del año que indique el usuario.
     """
     años_ligas = [2015,2016,2017,2018,2019,2020,2021,2022,2023]
+    print("-"*25)
     print("Temporadas de la Liga Profesional Argentina.")
     for año in años_ligas:
         print(f" - {año}")
-    print("-"*20)
+    print("-"*25)
     print("Ingrese el año de la temporada que desea conocer: ", end="")
     año_liga = int(validador_num(input_num(), años_ligas))
 
@@ -161,7 +163,7 @@ def mostrar_tabla() -> None:
     respuesta = requests.get(url, params=params, headers=headers).json()["response"][0]["league"]["standings"][0]
     #STANDINGS[season][team]←indices de listas : ['rank', 'team', 'points', 'goalsDiff', 'group', 'form', 'status', 'description', 'all', 'home', 'away', 'update']
     os.system("cls")
-    print(f"---- Liga Profesional Argentina {año_liga} ----")
+    print(f"--- Liga Profesional Argentina {año_liga} ---")
     iterador = 0
     for equipo in respuesta:
         iterador += 1
@@ -171,7 +173,7 @@ def mostrar_tabla() -> None:
             puntitos = "." * (31 - len(equipo["team"]["name"]))
         
         print("{}. {}{}{}pts".format(equipo["rank"], equipo["team"]["name"], puntitos, equipo["points"]))
-    print("-"*40)
+    print("-"*39)
 
 def mostrar_estadio_y_escudo(dicc_equipos:dict):
     """
@@ -200,7 +202,7 @@ def mostrar_estadio_y_escudo(dicc_equipos:dict):
     for i in range(len(respuesta)):
         if respuesta[i]["team"]["id"] == id_equipo_a_buscar:
             print(respuesta[i]["team"]["logo"])   #Ver si se puede imprimir el escudo en lugar de una url
-            print("----" + respuesta[i]["team"]["name"].upper() + "----")
+            print("-------" + respuesta[i]["team"]["name"].upper() + "-------")
             print("Año de fundación:", respuesta[i]["team"]["founded"])
             print("País:", respuesta[i]["team"]["country"])
             print("Ciudad:", respuesta[i]["venue"]["city"])
@@ -259,8 +261,14 @@ def mostrar_grafico_goles(dicc_equipos:dict):
     numeros_porcentajes= []
     porcentajes =[] #["0-15"],["16-30"],["31-45"],["46-60"],["61-75"],["76-90"],["91-105"],["106-120"] ej: ['31.58%', '10.53%', '10.53%', '15.79%', '10.53%', '15.79%', '5.26%', None]
     porcentajes_str = ""
+    os.system("cls")
+    print("-----",dicc_equipos[id_equipo].upper(),"-----")
+    print(f"Temporada: {año_liga}")
     print("Goles a favor:", respuesta["total"]["total"])
+    print("-"*25)
     input("Presione enter para abrir el gráfico")
+    
+    
     for minutos in respuesta["minute"]:
         porcentajes.append(respuesta["minute"][minutos]["percentage"])
     for i in range(len(porcentajes)):
@@ -278,14 +286,15 @@ def mostrar_grafico_goles(dicc_equipos:dict):
     plt.xlabel("Minutos")
     plt.ylabel("Porcentaje de goles")
     plt.yticks(sorted(numeros_porcentajes))
-    plt.title("PORCENTAJE GOLES A FAVOR\n TOTAL DE GOLES EN LA TEMPORADA {}: {}".format(año_liga, respuesta["total"]["total"]))
+    plt.title("PORCENTAJE DE GOLES POR MINUTO\n TOTAL DE GOLES EN LA TEMPORADA {}: {}".format(año_liga, respuesta["total"]["total"]))
     plt.bar(x,y, linewidth=2, edgecolor="black")
     plt.show()
 
 def mail_validado() -> str:
     os.system("cls")
-    print("El mail debe cumplir las siguientes condiciones:\n - Formato: nombre_usuario@nombre_servicio_correo.com\n - \"nombre_usuario\" y \"nombre_servicio_correo\" no deben contener espacios ni\
- caracteres especiales.\n - Ejemplo: Leonel@gmail.com")
+    print("El mail debe cumplir las siguientes condiciones:")
+    print("-"*25)
+    print(" - Formato: nombre_usuario@nombre_servicio_correo.com\n - \"nombre_usuario\" y \"nombre_servicio_correo\" no deben contener espacios ni caracteres especiales.\n - Ejemplo: Leonel@gmail.com")
     print("-"*25)
     mail = input("Ingrese un mail: ")
     while len(mail) == 0:
@@ -372,7 +381,13 @@ def crear_usuario() -> dict:
     data_inicio_sesion.append(nombre_de_usuario)
     #Guardar Usuario en usuarios.csv
     crear_nuevo_usuario(data_inicio_sesion)
-    return obtener_usuario(data_inicio_sesion[0])
+    usuario:dict = obtener_usuario(data_inicio_sesion[0])
+    print("-"*25)
+    print(f"Bienvenido {usuario[data_inicio_sesion[0]][0]}!")
+    print(f"Tienes ${usuario[data_inicio_sesion[0]][4]} disponible.")
+    print("-"*25)
+    input("Presione enter para ingresar al menú.")
+    return usuario
 
 def verificar_contrasena(contrasena_encriptada: str, contrasena_ingresada:str) -> bool:
     if(pbkdf2_sha256.verify(contrasena_ingresada, contrasena_encriptada)):
@@ -386,15 +401,20 @@ def ingresar_usuario() -> dict:
     data_inicio_sesion: list = pedir_data_inicio_sesion()
     #Ver que exista
     while data_inicio_sesion[0] not in usuarios_existentes.keys():
-        print("El usuario no existe. Intente con otro e-mail.")
+        print("-"*25)
+        input("El usuario no existe. Presione enter para intentar con otro e-mail.")
         data_inicio_sesion = pedir_data_inicio_sesion()
     #Chequeo contraseña
     while not verificar_contrasena(usuarios_existentes[data_inicio_sesion[0]][1], data_inicio_sesion[1]):
+        print("-"*25)
         print("La contraseña ingresada es incorrecta.")
         data_inicio_sesion[1] = input("Intente nuevamente: ")
     usuario: dict = {data_inicio_sesion[0]: usuarios_existentes[data_inicio_sesion[0]]}
+    print("-"*25)
     print(f"Bienvenido {usuario[data_inicio_sesion[0]][0]}!")
     print(f"Tienes ${usuario[data_inicio_sesion[0]][4]} disponible.")
+    print("-"*25)
+    input("Presione enter para ingresar al menú.")
     return usuario
 
 def verificar_contrasena(contrasena_encriptada: str, contrasena_ingresada:str) -> bool:
@@ -411,11 +431,14 @@ def modificar_usuario(usuarios_actualizados: dict) -> None:
             csvWriter.writerow((id, usuarios_actualizados[id][0], usuarios_actualizados[id][1], usuarios_actualizados[id][2], usuarios_actualizados[id][3], usuarios_actualizados[id][4]))
 
 def resolver_carga_dinero(usuario: dict) -> None:
-    print("Ingrese el dinero a cargar a su cuenta.")
-    cantidad_a_cargar: int = input_float()
+    print("Ingrese el dinero a cargar a su cuenta:")
+    print("-"*25)
+    print("$ ", end = "")
+    cantidad_a_cargar: float = input_float()
     while cantidad_a_cargar <= 0:
         print("No se puede cargar la cantidad ingresada. Intente nuevamente.")
-        cantidad_a_cargar: int = input_float()
+        print("$ ", end = "")
+        cantidad_a_cargar: float = input_float()
     cargar_dinero(usuario, cantidad_a_cargar)
     
 def cargar_dinero(usuario: dict, cantidad_a_cargar: float) -> None:
@@ -423,7 +446,11 @@ def cargar_dinero(usuario: dict, cantidad_a_cargar: float) -> None:
     email: str = list(usuario.keys())[0]
     dinero_disponible = float(usuarios_existentes[email][4])
     usuarios_existentes[email][4] = str(dinero_disponible + cantidad_a_cargar)
-    print(f"Carga exitosa! Ahora dispones de ${usuarios_existentes[email][4]}!")
+    os.system("cls")
+    print("------Carga exitosa------")
+    print(f"{[*usuario.values()][0][0]}, cargaste ${cantidad_a_cargar}!")
+    print(f"Ahora dispones de ${usuarios_existentes[email][4]}.")
+    print("-"*25)
     modificar_usuario(usuarios_existentes)
 
 #def obtener_usuario(email: str) -> dict:
@@ -449,8 +476,9 @@ def iniciar_sesion() -> dict:
 #Siempre va a haber al menos un usuario
 #Puede ser que todos los usuarios no hayan apostado (todos 0$)
 def mostrar_usuario_que_mas_aposto() -> None:
+    os.system("cls")
     usuarios_existentes: dict = obtener_usuarios_existentes()
-    mayor_monto_apostado: float = 0
+    mayor_monto_apostado: float = 0.0
     usuarios_que_mas_apostaron: dict = {}
     for id in usuarios_existentes:
         monto_apostado_usuario: float = float(usuarios_existentes[id][2])
@@ -459,12 +487,17 @@ def mostrar_usuario_que_mas_aposto() -> None:
             usuarios_que_mas_apostaron = {id: usuarios_existentes[id]}
         elif(monto_apostado_usuario == mayor_monto_apostado):
             usuarios_que_mas_apostaron = usuarios_que_mas_apostaron | {id: usuarios_existentes[id]}
-    if(mayor_monto_apostado == 0):
+    if(mayor_monto_apostado == 0.0):
         print("Todavia no se realizaron apuestas.")
+        print("-"*25)
     else:
-        print("Usuarios con más apuestas:")
+        print("Usuarios que más dinero apostaron")
+        print("-"*33)
         for id in usuarios_que_mas_apostaron:
-            print(f"'{usuarios_que_mas_apostaron[id][0]}': ${usuarios_que_mas_apostaron[id][2]}")
+            print(f" - {usuarios_que_mas_apostaron[id][0]}")
+        print("-"*28)
+        print(f"Monto apostado: ${[*usuarios_que_mas_apostaron.values()][0][2]}")
+        print("-"*28)
 
 def main() -> None:
     diccionario_equipos = {451: 'Boca JRS', 434: 'Gimnasia (LP)', 435: 'River Plate', 436: 'Racing Club', 437: 'Rosario Central', 438: 'Vélez Sarsfield', 439: 'Godoy cruz',
@@ -475,7 +508,11 @@ def main() -> None:
     print("--------Bienvenido a Jugársela--------")
     input("Pulse Enter para iniciar la aplicación")
     #Login
+    
     usuario: dict = iniciar_sesion()
+    # ↓↓↓↓ USUARIO PARA PROBAR PUNTOS QUE NO TENGAN QUE VER CON APUESTAS Y TARIFAS ↓↓↓↓
+    #usuario: dict = {'uma@gmail.com': ['Mofletes', '$pbkdf2-sha256$29000$ba1VqhUiJCQEQGgtJWQMoQ$KwNC.BSCTTMZhIEqXjkShUWe7HY1mh9OHsNfIQ1twK8', '0', 'DDMMYYYY', '0']}
+    
     menu_principal(usuario)
     print("Ingrese una opción del menú: ", end="")
     opcion = validador_str(input_alfa(), ["a","b","c","d","e","f","g","h","i"])
@@ -495,7 +532,7 @@ def main() -> None:
             input("Pulse enter para continuar.")
         elif(opcion == 'e'):
             resolver_carga_dinero(usuario)
-            usuario = obtener_usuario(usuario.keys())
+            usuario = obtener_usuario([*usuario.keys()][0])
             input("Pulse enter para continuar.")
         elif(opcion == 'f'):
             mostrar_usuario_que_mas_aposto()

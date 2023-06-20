@@ -27,7 +27,7 @@ def obtener_lista_partidos(respuesta, id_equipo_a_buscar) -> list:
             lista_partidos.append([numero_fecha, respuesta[i]["teams"]["home"]["name"], "(V)", respuesta[i]["fixture"]["id"]])
     return sorted(lista_partidos)
 
-def mostrar_fixture(dicc_equipos):
+def busca_fixture(dicc_equipos):
     lista_equipos = [*dicc_equipos.values()]
     lista_equipos_ids = [*dicc_equipos.keys()]
     lista_opciones = []
@@ -47,7 +47,7 @@ def mostrar_fixture(dicc_equipos):
     lista_partidos = obtener_lista_partidos(respuesta, id_equipo_a_buscar)
     return lista_partidos, id_equipo_a_buscar
 
-def busca_partido(dinero_disponible_usuario, dicc_equipos, lista_partidos, id_equipo):
+def elije_partido(dinero_disponible_usuario, dicc_equipos, lista_partidos, id_equipo):
     #Imprimo Fixture
     print(f"El fixture de {dicc_equipos[id_equipo]} en este campeonato es:")
     print("------PRIMERA FASE------")
@@ -58,12 +58,20 @@ def busca_partido(dinero_disponible_usuario, dicc_equipos, lista_partidos, id_eq
             print("------SEGUNDA FASE------")
             centena_fase = 200
     #Pido Partido a apostar
+    print("Si desea aostar a un partido de la primera fase escriba ´1´ y si desea apostar para uno de la segunda fase escriba ´2´")
+    fase = validador_num(input_num())
+    if fase ==1: centena_fase = 100 #No pongo el caso de que sea 2 ya que centena fase ya vale 200 desde el for anterior
     print("Escriba el número del partido en el cual quiere realizar su apuesta: ", end="")
-    partido_a_apostar = input_num()
-    while partido_a_apostar>40 or partido_a_apostar<1:
+    partido_a_apostar = input_num() + centena_fase
+    while not(partido_a_apostar>100 and partido_a_apostar<127) and not(partido_a_apostar>200 and partido_a_apostar<214) and (partido_a_apostar - centena_fase)<27:
+        #Chequeo que el partido este en los intervalos de partidos de cada fase (primera fase tiene 27 partidos y segunda fase  14)
+        #Tambien chequeo que el ingreso del usuario no sea lo suficientemente mayor como para entrar en el rango de la segunda fase si pone por ejemplo primera fase y partido 110
         print("Ingreso inválido. Ingrese uno de los numeros colocados entre las opciones antes mostradas: ", end="")
         partido_a_apostar = input_num()
-    #Buscar id del partido a apostar
+        partido_a_apostar += centena_fase #Sumo 100 o 200 para saber a que fase quiere apostar el usuario y poder buscar el partido correcto (De ultima podemos sacar lo de las fases porque puede ser un quilombo)
+    #Busca id del partido a apostar
+    id_partido = Busca_id_partido(lista_partidos, partido_a_apostar)
+    #Pido a que equipo desea apostar
     print("En caso de querer apostar por el local ingrese 1, en caso de apostar por un empate ingrese 2, y en caso de apostar por el visitante ingrese 3 \n")
     apuesta = validador_num(input_num(), [1,2,3])
     #VALIDAR EL INGRESO DEL USUARIO
@@ -74,24 +82,36 @@ def busca_partido(dinero_disponible_usuario, dicc_equipos, lista_partidos, id_eq
         print(f"No cuenta con esa cantidad de dinero en la cuenta. Su plata actual es {dinero_disponible_usuario}.\nIngresé su apuesta: ", end="")
         dinero_apostado = input_num()
     return dinero_apostado, apuesta, id_partido
-    
-def Apuestas():
+
+def busca_id_partido(lista_partidos, partido_apostado):
+    if partido_apostado<200: 
+        fase = "1st"
+        partido_apostado -= 100
+    else: 
+        fase = "2nd"
+        partido_apostado -= 200
+    for i in lista_partidos:
+        if i[0] == f"{fase} Phase - {partido_apostado}":
+            return i[2]
+
+def main_apuestas(): #abierto a cambio de nombre, lo cambie para que no sea parecido a una variable
     dicc_equipos = {451: 'Boca JRS', 434: 'Gimnasia (LP)', 435: 'River Plate', 436: 'Racing Club', 437: 'Rosario Central', 438: 'Vélez Sarsfield', 439: 'Godoy cruz',
     440: 'Belgrano (Cba)', 441: 'Unión de Santa Fé', 442: 'Defensa y Justicia', 445: 'Huracán', 446: 'Lanús', 448: 'Colón de Santa Fé', 449: 'Banfield', 450: 'Estudiantes (LP)', 452: 'Tigre',
     453: 'Independiente', 455: 'Atlético Tucumán', 456: 'Talleres (Cba)', 457: 'Newells Old Boys', 458: 'Argentinos JRS', 459: 'Arsenal de Sarandí', 460: 'San Lorenzo', 474: 'Sarmiento (J)',
     478: 'Instituto (Cba)', 1064: 'Platense', 4065: 'Central Córdoba (SdE)', 2434: 'Barracas Central'}
     usuario = {'prueba@gmail.com': ['Prueba', '$pbkdf2-sha256$29000$ZGxN6Z2zdi5lrPVeS6l1bg$Mq3DdwiQoYcOoZLHF.nYBb5vIMWs8dK3RqCE5zXiajQ', '120', 'DDMMYYYY', '290']}
     dinero_disponible_usuario: float = float([*usuario.values()][0][4])
-    lista_partidos, id_equipo = mostrar_fixture(dicc_equipos)
+    lista_partidos, id_equipo = busca_fixture(dicc_equipos)
     print(id_equipo)
-    dinero_apostado, apuesta = busca_partido(dinero_disponible_usuario, dicc_equipos, lista_partidos, id_equipo)
-    #Buscar win or draw con el id del partido
-    ganancia = resolver_apuesta(dinero_disponible_usuario, dinero_apostado, apuesta, win_or_draw)
+    dinero_apostado, apuesta, id_partido = elije_partido(dinero_disponible_usuario, dicc_equipos, lista_partidos, id_equipo)
+    win_or_draw:bool = obtener_win_or_draw(id_partido, apuesta)
+    #TO-DO Buscar win or draw con el id del partido y ver si la apuesta coincide con el win or draw
+    ganancia = resolver_apuesta(dinero_apostado, apuesta, win_or_draw)
     cargar_dinero(usuario, ganancia)
 
 #No incluyo el partido porque entiendo que no nos interesa para saber cuanto gana, lo unico que nos
-#interesa es saber si el win or draw es true y si se apuesta por el local/empate/visitante
-def resolver_apuesta(dinero_disponible_usuario:float, dinero_apostado:float, apuesta:int, win_or_draw:bool):
+#interesa es saber es si el win or draw es true y si se apuesta por el local/empate/visitante
+def resolver_apuesta(dinero_apostado:float, apuesta:int, win_or_draw:bool):
     #Dado simula resultado:
     #1 -> Gana Local
     #2 -> Empate
@@ -99,36 +119,39 @@ def resolver_apuesta(dinero_disponible_usuario:float, dinero_apostado:float, apu
     dado = random.randint(1,3)
     #TO-DO Resolver cantidad ganancia con win_or_draw
     multiplicador = 3
-    if win_or_draw: multiplicador = 0,3
+    if win_or_draw: multiplicador = 0.3
     #Dado == 2 da Empate
     #Falta ver si se quita primero lo apostado y despues lo recupera o si se quita solo en caso de perder
     if dado == 2:
         #Dado da Empate y se Aposto Empate
         if apuesta == 2:
-            print(f"Felicitacioness!! La apuesta ha sido un exito, ya puede encontrar su ganancia de {dinero_apostado*multiplicador} además de recuperar los {plata_apostada}$ apostados previamente.")
-            dinero_disponible_usuario += dinero_apostado*multiplicador
+            print(f"Felicitacioness!! La apuesta ha sido un exito, ya puede encontrar su ganancia de ${dinero_apostado*multiplicador}.")
+            ganancia = dinero_apostado*0.5
         #Dado da Empate y se Aposto otra cosa
         else:
             print("Lo sentimos. El partido terminó empatado por lo que lamentablemente no se recupera lo apostado")
+            ganancia = -dinero_apostado
     #Dado == 1 da que Gana Local
     elif dado == 1:
         #Dado da Gana Local y se Aposto Gana Local
         if apuesta == 1:
-            print(f"Felicitaciones!! Ganó (L)!! La apuesta ha sido un exito, ya puede encontrar su ganancia de {dinero_apostado*multiplicador} además de recuperar los {plata_apostada}$ apostados previamente.")
-            dinero_disponible_usuario += dinero_apostado*multiplicador
+            print(f"Felicitaciones!! Ganó (L)!! La apuesta ha sido un exito, ya puede encontrar su ganancia de ${dinero_apostado*multiplicador}.")
+            ganancia = dinero_apostado*multiplicador
         #Dado da gana Local y se Aposto otra cosa
         else:
             print("Lo sentimos. El ganador ha sido el local por lo que lamentablemente no se recupera lo apostado")
+            ganancia = -dinero_apostado
     #Dado == 3 da que Gana Visitante
     elif dado == 3:
         #Dado da gana V y se Aposto Gana V
         if apuesta == 3:
-            print(f"Felicitacioness!! La apuesta ha sido un exito, ya puede encontrar su ganancia de {dinero_apostado*multiplicador} además de recuperar los {plata_apostada}$ apostados previamente.")
-            dinero_disponible_usuario += dinero_apostado*multiplicador
+            print(f"Felicitacioness!! La apuesta ha sido un exito, ya puede encontrar su ganancia de ${dinero_apostado*multiplicador}.")
+            ganancia = dinero_apostado*multiplicador
         #Dado da gana V y se Aposto otra cosa
         else:
             print("Lo sentimos. El ganador ha sido el visitante por lo que lamentablemente no se recupera lo apostado")
-    return dinero_apostado*multiplicador
+            ganancia = -dinero_apostado
+    return ganancia
 
 #FUNCIONES QUE YA ESTAN EN JUGARSELA:PY
 def cargar_dinero(usuario: dict, cantidad_a_cargar: int) -> None:
@@ -189,7 +212,7 @@ def input_float() -> float:
         numero = input("El valor ingresado debe ser un número. Inténtelo nuevamente: ")
     numero = float(numero)
     return numero
-Apuestas()
+main_apuestas()
 
 """def MostrarFixtureViejo():
     dicc_equipos = {451: 'Boca JRS', 434: 'Gimnasia (LP)', 435: 'River Plate', 436: 'Racing Club', 437: 'Rosario Central', 438: 'Vélez Sarsfield', 439: 'Godoy cruz',

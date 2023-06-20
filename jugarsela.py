@@ -4,6 +4,19 @@ import csv
 import matplotlib.pyplot as plt
 from passlib.hash import pbkdf2_sha256
 
+def es_float(num) -> bool:
+    try:
+        float(num)
+        return True
+    except ValueError:
+        return False
+
+def input_float() -> float:
+    numero = input("")
+    while not es_float(numero):
+        numero = input("El valor ingresado debe ser un número. Inténtelo nuevamente: ")
+    numero = float(numero)
+    return numero
 
 def input_num() -> int:
     """
@@ -338,7 +351,8 @@ def crear_nuevo_usuario(data_inicio_sesion: list) -> None:
             csvWriter.writerow((id, usuarios_existentes[id][0], usuarios_existentes[id][1], usuarios_existentes[id][2], usuarios_existentes[id][3], usuarios_existentes[id][4]))
         csvWriter.writerow((data_inicio_sesion[0], data_inicio_sesion[2], contrasena_encriptada, "0", "DDMMYYYY", "0"))
 
-def crear_usuario() -> dict:                 #TO-DO: Agregar pregunta al usuario, si el mail existe... desea loguearse con el mismo?.
+#TO-DO: Agregar pregunta al usuario, si el mail existe... desea loguearse con el mismo?.
+def crear_usuario() -> dict:
     #Busco Usuarios existentes
     usuarios_existentes: dict = obtener_usuarios_existentes()
     #Pido usuario y contraseña
@@ -361,7 +375,8 @@ def verificar_contrasena(contrasena_encriptada: str, contrasena_ingresada:str) -
         return True
     return False
 
-def ingresar_usuario() -> dict:                 #TO-DO: Agregar opcion de dejar al usuario volver para atras para registrar un mail.
+#TO-DO: Agregar opcion de dejar al usuario volver para atras para registrar un mail.
+def ingresar_usuario() -> dict:
     usuarios_existentes: dict = obtener_usuarios_existentes()
     #Pido usuario y contraseña
     data_inicio_sesion: list = pedir_data_inicio_sesion()
@@ -393,16 +408,16 @@ def modificar_usuario(usuarios_actualizados: dict) -> None:
 
 def resolver_carga_dinero(usuario: dict) -> None:
     print("Ingrese el dinero a cargar a su cuenta.")
-    cantidad_a_cargar: int = input_num()
+    cantidad_a_cargar: int = input_float()
     while cantidad_a_cargar <= 0:
         print("No se puede cargar la cantidad ingresada. Intente nuevamente.")
-        cantidad_a_cargar: int = input_num()
+        cantidad_a_cargar: int = input_float()
     cargar_dinero(usuario, cantidad_a_cargar)
     
-def cargar_dinero(usuario: dict, cantidad_a_cargar: int) -> None:
+def cargar_dinero(usuario: dict, cantidad_a_cargar: float) -> None:
     usuarios_existentes: dict = obtener_usuarios_existentes()
     email: str = list(usuario.keys())[0]
-    dinero_disponible = int(usuarios_existentes[email][4])
+    dinero_disponible = float(usuarios_existentes[email][4])
     usuarios_existentes[email][4] = str(dinero_disponible + cantidad_a_cargar)
     print(f"Carga exitosa! Ahora dispones de ${usuarios_existentes[email][4]}!")
     modificar_usuario(usuarios_existentes)
@@ -431,10 +446,10 @@ def iniciar_sesion() -> dict:
 #Puede ser que todos los usuarios no hayan apostado (todos 0$)
 def mostrar_usuario_que_mas_aposto() -> None:
     usuarios_existentes: dict = obtener_usuarios_existentes()
-    mayor_monto_apostado: int = 0
+    mayor_monto_apostado: float = 0
     usuarios_que_mas_apostaron: dict = {}
     for id in usuarios_existentes:
-        monto_apostado_usuario: int = int(usuarios_existentes[id][2])
+        monto_apostado_usuario: float = float(usuarios_existentes[id][2])
         if(monto_apostado_usuario > mayor_monto_apostado):
             mayor_monto_apostado = monto_apostado_usuario
             usuarios_que_mas_apostaron = {id: usuarios_existentes[id]}

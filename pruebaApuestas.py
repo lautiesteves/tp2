@@ -2,27 +2,6 @@ import random
 import requests
 import csv
 
-def validador_num(valor:int, valores:list) -> int:
-    """
-    PRE: Ingresa un entero y una lista.
-    POST: Devuelve el entero solo cuando verifique que el mismo pertenezca a la lista.
-    """
-    while valor not in valores:
-        print(f"{valor} es una opción inválida. Inténtelo nuevamente: ", end="")
-        valor = input_num()
-    return valor
-
-def input_num() -> int:
-    """
-    PRE: -
-    POST: Devuelve un valor numérico.
-    """
-    numero = input("")
-    while numero.isnumeric() != True:
-        numero = input("El valor ingresado debe ser un número. Inténtelo nuevamente: ")
-    numero = int(numero)
-    return numero
-
 def obtener_fixture() -> dict:
     headers = {'x-rapidapi-host': "v3.football.api-sports.io", 'x-rapidapi-key': "ef7e9b83b25359c08ef9f5135245bf8d"}
     params = {"league":"128","season": 2023}
@@ -110,9 +89,8 @@ def Apuestas():
     ganancia = resolver_apuesta(dinero_disponible_usuario, dinero_apostado, apuesta, win_or_draw)
     cargar_dinero(usuario, ganancia)
 
-
 #No incluyo el partido porque entiendo que no nos interesa para saber cuanto gana, lo unico que nos
-#interesa es saber si el win or draw es true y si se apuesta por el local
+#interesa es saber si el win or draw es true y si se apuesta por el local/empate/visitante
 def resolver_apuesta(dinero_disponible_usuario:float, dinero_apostado:float, apuesta:int, win_or_draw:bool):
     #Dado simula resultado:
     #1 -> Gana Local
@@ -177,7 +155,42 @@ def obtener_usuarios_existentes() -> dict:
             usuarios_existentes[row[0]] = [row[1],row[2],row[3],row[4], row[5]]
     return usuarios_existentes
 
+def validador_num(valor:int, valores:list) -> int:
+    """
+    PRE: Ingresa un entero y una lista.
+    POST: Devuelve el entero solo cuando verifique que el mismo pertenezca a la lista.
+    """
+    while valor not in valores:
+        print(f"{valor} es una opción inválida. Inténtelo nuevamente: ", end="")
+        valor = input_num()
+    return valor
+
+def input_num() -> int:
+    """
+    PRE: -
+    POST: Devuelve un valor numérico.
+    """
+    numero = input("")
+    while numero.isnumeric() != True:
+        numero = input("El valor ingresado debe ser un número. Inténtelo nuevamente: ")
+    numero = int(numero)
+    return numero
+
+def es_float(num) -> bool:
+    try:
+        float(num)
+        return True
+    except ValueError:
+        return False
+
+def input_float() -> float:
+    numero = input("")
+    while not es_float(numero):
+        numero = input("El valor ingresado debe ser un número. Inténtelo nuevamente: ")
+    numero = float(numero)
+    return numero
 Apuestas()
+
 """def MostrarFixtureViejo():
     dicc_equipos = {451: 'Boca JRS', 434: 'Gimnasia (LP)', 435: 'River Plate', 436: 'Racing Club', 437: 'Rosario Central', 438: 'Vélez Sarsfield', 439: 'Godoy cruz',
     440: 'Belgrano (Cba)', 441: 'Unión de Santa Fé', 442: 'Defensa y Justicia', 445: 'Huracán', 446: 'Lanús', 448: 'Colón de Santa Fé', 449: 'Banfield', 450: 'Estudiantes (LP)', 452: 'Tigre',

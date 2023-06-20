@@ -23,24 +23,14 @@ def input_num() -> int:
     numero = int(numero)
     return numero
 
-def mostrar_fixture(dicc_equipos):
-    lista_equipos = [*dicc_equipos.values()]
-    lista_equipos_ids = [*dicc_equipos.keys()]
-    lista_opciones = []
-    lista_partidos = []
-    print("Equipos de la Liga Profesional Argentina:")
-    for i in range(len(lista_equipos)):
-        lista_opciones.append(i+1)
-        print(f"{i+1}. {lista_equipos[i]}")
-    print("-"*20)
-    print("Ingrese el equipo del que desea obtener información sobre el fixture: ", end="")
-    equipo_a_buscar = validador_num(input_num(), lista_opciones)
-    id_equipo_a_buscar = lista_equipos_ids[equipo_a_buscar-1]
+def obtener_fixture() -> dict:
     headers = {'x-rapidapi-host': "v3.football.api-sports.io", 'x-rapidapi-key': "ef7e9b83b25359c08ef9f5135245bf8d"}
-    params ={"league":"128","season": 2023}
+    params = {"league":"128","season": 2023}
     url = "https://v3.football.api-sports.io/fixtures"
-    respuesta = requests.get(url, params=params, headers=headers).json()["response"] #['fixture'],["league"]["round"], ['teams'][home or away]["id","name","logo","winner":bool]
+    return requests.get(url, params=params, headers=headers).json()["response"] #['fixture'],["league"]["round"], ['teams'][home or away]["id","name","logo","winner":bool]
 
+def obtener_lista_partidos(respuesta, id_equipo_a_buscar) -> list:
+    lista_partidos = []
     for i in range(len(respuesta)):
         if id_equipo_a_buscar == respuesta[i]["teams"]["home"]["id"]:
             print(respuesta[i]["league"]["round"])
@@ -56,11 +46,30 @@ def mostrar_fixture(dicc_equipos):
             else:
                 numero_fecha = int(ronda[0] + "0" + ronda[12])
             lista_partidos.append([numero_fecha, respuesta[i]["teams"]["home"]["name"], "(V)", respuesta[i]["fixture"]["id"]])
-    lista_partidos = sorted(lista_partidos)
-    
+    return sorted(lista_partidos)
+
+def mostrar_fixture(dicc_equipos):
+    lista_equipos = [*dicc_equipos.values()]
+    lista_equipos_ids = [*dicc_equipos.keys()]
+    lista_opciones = []
+    #Imprimo equipos
+    print("Equipos de la Liga Profesional Argentina:")
+    for i in range(len(lista_equipos)):
+        lista_opciones.append(i+1)
+        print(f"{i+1}. {lista_equipos[i]}")
+    print("-"*20)
+    print("Ingrese el equipo del que desea obtener información sobre el fixture: ", end="")
+    #Pido a usuario el Equipo
+    equipo_a_buscar = validador_num(input_num(), lista_opciones)
+    id_equipo_a_buscar = lista_equipos_ids[equipo_a_buscar-1]
+    #Get Fixture
+    respuesta = obtener_fixture()
+    #Armo Lista de Partidos
+    lista_partidos = obtener_lista_partidos(respuesta, id_equipo_a_buscar)
     return lista_partidos, id_equipo_a_buscar
 
-def busca_partido(dicc_equipos, lista_partidos, id_equipo):
+def busca_partido(dinero_disponible_usuario, dicc_equipos, lista_partidos, id_equipo):
+    #Imprimo Fixture
     print(f"El fixture de {dicc_equipos[id_equipo]} en este campeonato es:")
     print("------PRIMERA FASE------")
     centena_fase = 100
@@ -69,6 +78,7 @@ def busca_partido(dicc_equipos, lista_partidos, id_equipo):
         if partido[0] == 127: 
             print("------SEGUNDA FASE------")
             centena_fase = 200
+    #Pido Partido a apostar
     print("Escriba el número del partido en el cual quiere realizar su apuesta: ", end="")
     partido_a_apostar = input_num()
     while partido_a_apostar>40 or partido_a_apostar<1:
@@ -80,10 +90,10 @@ def busca_partido(dicc_equipos, lista_partidos, id_equipo):
     #VALIDAR EL INGRESO DEL USUARIO
     print("Escriba la cantidad de dinero que desea apostar: ", end="")
     dinero_apostado = input_num()
-    while dinero_apostado > billetera:
-        print(f"No cuenta con esa cantidad de dinero en la cuenta. Su plata actual es {billetera}.\nIngresé su apuesta: ", end="")
+    #Validar que el usuario cuente con ese dinero
+    while dinero_apostado > dinero_disponible_usuario:
+        print(f"No cuenta con esa cantidad de dinero en la cuenta. Su plata actual es {dinero_disponible_usuario}.\nIngresé su apuesta: ", end="")
         dinero_apostado = input_num()
-    #VALIDAR CON LA BILLETERA QUE EL USUARIO CUENTE CON ESE DINERO
     if apuesta == 1: local = True
     return dinero_apostado, local, id_partido
     
@@ -93,11 +103,13 @@ def Apuestas():
     440: 'Belgrano (Cba)', 441: 'Unión de Santa Fé', 442: 'Defensa y Justicia', 445: 'Huracán', 446: 'Lanús', 448: 'Colón de Santa Fé', 449: 'Banfield', 450: 'Estudiantes (LP)', 452: 'Tigre',
     453: 'Independiente', 455: 'Atlético Tucumán', 456: 'Talleres (Cba)', 457: 'Newells Old Boys', 458: 'Argentinos JRS', 459: 'Arsenal de Sarandí', 460: 'San Lorenzo', 474: 'Sarmiento (J)',
     478: 'Instituto (Cba)', 1064: 'Platense', 4065: 'Central Córdoba (SdE)', 2434: 'Barracas Central'}
-
-    lista_partidos, id_equipo, id_partido = mostrar_fixture(dicc_equipos)
-    dinero_apostado, local_bool = busca_partido(dicc_equipos, lista_partidos, id_equipo)
-    #Buscar win or draw con el id del partido 
-    FuncionPagaOQuita(billetera, dinero_apostado, local_bool, win_or_draw)
+    usuario = {'prueba@gmail.com': ['Prueba', '$pbkdf2-sha256$29000$ZGxN6Z2zdi5lrPVeS6l1bg$Mq3DdwiQoYcOoZLHF.nYBb5vIMWs8dK3RqCE5zXiajQ', '120', 'DDMMYYYY', '290']}
+    dinero_disponible_usuario: float = float([*usuario.values()][0][4])
+    lista_partidos, id_equipo = mostrar_fixture(dicc_equipos)
+    print(id_equipo)
+    dinero_apostado, local_bool = busca_partido(dinero_disponible_usuario, dicc_equipos, lista_partidos, id_equipo)
+    #Buscar win or draw con el id del partido
+    FuncionPagaOQuita(dinero_disponible_usuario, dinero_apostado, local_bool, win_or_draw)
 
 
 Apuestas()

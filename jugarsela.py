@@ -339,13 +339,13 @@ def obtener_usuarios_existentes() -> dict:
             usuarios_existentes[row[0]] = [row[1],row[2],row[3],row[4], row[5]]
     return usuarios_existentes
 
-def obtener_transacciones_existentes() -> dict:
-    transacciones_existentes: dict = {}
+def obtener_transacciones_existentes() -> list:
+    transacciones_existentes: list = []
     with open('transacciones.csv', newline='') as transaccionesCsv:
         csvReader = csv.reader(transaccionesCsv, delimiter = ",")
         next(csvReader)
         for row in csvReader:
-            transacciones_existentes[row[0]] = [row[1],row[2],row[3]]
+            transacciones_existentes.append([row[0], row[1],row[2],row[3]])
     return transacciones_existentes
 
 def pedir_data_inicio_sesion() -> list:
@@ -375,12 +375,12 @@ def crear_nuevo_usuario(data_inicio_sesion: list) -> None:
         csvWriter.writerow((data_inicio_sesion[0], data_inicio_sesion[2], contrasena_encriptada, "0", obtener_fecha(), "0"))
 
 def crear_nueva_transaccion(id_usuario: str, fecha: str, tipo: str, importe: float) -> None:
-    transacciones_existentes: dict = obtener_transacciones_existentes()
+    transacciones_existentes: list = obtener_transacciones_existentes()
     with open('transacciones.csv', 'w', newline='') as transaccionesCsv:
         csvWriter = csv.writer(transaccionesCsv, delimiter = ",", quotechar = '"', quoting = csv.QUOTE_NONNUMERIC)
         csvWriter.writerow(("ID Usuario", "Fecha de Transaccion", "Tipo de Resultado", "Importe"))
-        for id in transacciones_existentes:
-            csvWriter.writerow((id, transacciones_existentes[id][0], transacciones_existentes[id][1], transacciones_existentes[id][2]))
+        for transaccion in transacciones_existentes:
+            csvWriter.writerow((transaccion[0], transaccion[1], transaccion[2], transaccion[3]))
         csvWriter.writerow((id_usuario, fecha, tipo, importe))
 
 #TO-DO: Agregar pregunta al usuario, si el mail existe... desea loguearse con el mismo?.
@@ -522,6 +522,11 @@ def mostrar_usuario_que_mas_aposto() -> None:
         print(f"Monto apostado: ${[*usuarios_que_mas_apostaron.values()][0][2]}")
         print("-"*28)
 
+def mostrar_usuario_que_mas_gano() -> None:
+    transacciones_existentes: list = obtener_transacciones_existentes()
+    for id in transacciones_existentes:
+        return
+
 def main() -> None:
     diccionario_equipos = {451: 'Boca JRS', 434: 'Gimnasia (LP)', 435: 'River Plate', 436: 'Racing Club', 437: 'Rosario Central', 438: 'Vélez Sarsfield', 439: 'Godoy cruz',
     440: 'Belgrano (Cba)', 441: 'Unión de Santa Fé', 442: 'Defensa y Justicia', 445: 'Huracán', 446: 'Lanús', 448: 'Colón de Santa Fé', 449: 'Banfield', 450: 'Estudiantes (LP)', 452: 'Tigre',
@@ -561,7 +566,7 @@ def main() -> None:
             mostrar_usuario_que_mas_aposto()
             input("Pulse enter para continuar.")
         elif(opcion == 'g'):
-            mostrarUsuarioQueMasGano()
+            mostrar_usuario_que_mas_gano()
         elif(opcion == 'h'):
             apostar()
         

@@ -108,6 +108,10 @@ def main_apuestas(): #abierto a cambio de nombre, lo cambie para que no sea pare
     #TO-DO Buscar win or draw con el id del partido y ver si la apuesta coincide con el win or draw
     ganancia = resolver_apuesta(dinero_apostado, apuesta, win_or_draw)
     cargar_dinero(usuario, ganancia)
+    if(ganancia > 0):
+        crear_nueva_transaccion([*usuario.keys()][0], obtener_fecha(), "Gana", str(ganancia))
+    else:
+        crear_nueva_transaccion([*usuario.keys()][0], obtener_fecha(), "Pierde", str(ganancia))
 
 #No incluyo el partido porque entiendo que no nos interesa para saber cuanto gana, lo unico que nos
 #interesa es saber es si el win or draw es true y si se apuesta por el local/empate/visitante

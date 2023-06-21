@@ -1,5 +1,5 @@
 "ID Usuario","Nombre Usuario","Contraseña","Dinero Apostado","Fecha Última Apuesta","Dinero Disponible"
-"prueba@gmail.com","Prueba","$pbkdf2-sha256$29000$ZGxN6Z2zdi5lrPVeS6l1bg$Mq3DdwiQoYcOoZLHF.nYBb5vIMWs8dK3RqCE5zXiajQ","120","DDMMYYYY","290"
+"prueba@gmail.com","Prueba","$pbkdf2-sha256$29000$ZGxN6Z2zdi5lrPVeS6l1bg$Mq3DdwiQoYcOoZLHF.nYBb5vIMWs8dK3RqCE5zXiajQ","120","DDMMYYYY","390.0"
 "prueba2@gmail.com","Prueba2","$pbkdf2-sha256$29000$VGoN4fwfQwjBOEeI0bp3jg$mp0xf.G3tpnPPvi20hQLBQpsNlH4BivDeO.F7NNljb8","50","DDMMYYYY","230"
 "zeus@hotmail.com","Geronte","$pbkdf2-sha256$29000$0Prfe09JyTkHACDEeA/hvA$.h6heru2yjl.AvA42rCcvk8Ito4iA2nAAU6zfXJdyR4","120","DDMMYYYY","1500"
 "uma@gmail.com","Mofletes","$pbkdf2-sha256$29000$ba1VqhUiJCQEQGgtJWQMoQ$KwNC.BSCTTMZhIEqXjkShUWe7HY1mh9OHsNfIQ1twK8","0","DDMMYYYY","0"

@@ -522,10 +522,32 @@ def mostrar_usuario_que_mas_aposto() -> None:
         print(f"Monto apostado: ${[*usuarios_que_mas_apostaron.values()][0][2]}")
         print("-"*28)
 
-def mostrar_usuario_que_mas_gano() -> None:
+def obtener_balance_usuarios() -> dict:
+    balance_usuarios: dict = {}
     transacciones_existentes: list = obtener_transacciones_existentes()
-    for id in transacciones_existentes:
-        return
+    balance_usuarios: dict = {}
+    for transaccion in transacciones_existentes:
+        usuario: dict = obtener_usuario(transaccion[0])
+        nombre_de_usuario: str = usuario[transaccion[0]][0]
+        if transaccion[0] not in [*balance_usuarios.keys()]:
+            balance_usuarios = balance_usuarios | {nombre_de_usuario: float(transaccion[3])}
+        else:
+            balance_usuarios[nombre_de_usuario] += float(transaccion[3])
+
+def mostrar_usuario_que_mas_gano() -> None:
+    balance_usuarios: dict = obtener_balance_usuarios()
+    usuario_que_mas_gano: list = [["", 0]]
+    for nombre_de_usuario in balance_usuarios:
+        if balance_usuarios[nombre_de_usuario] > usuario_que_mas_gano[0][1]:
+            usuario_que_mas_gano = [nombre_de_usuario, balance_usuarios[nombre_de_usuario]]
+        elif balance_usuarios[nombre_de_usuario] == usuario_que_mas_gano[0][1] and balance_usuarios[nombre_de_usuario] > 0:
+            usuario_que_mas_gano.append([nombre_de_usuario, balance_usuarios[nombre_de_usuario]])
+    if usuario_que_mas_gano[0] == "":
+        print("Ningun usuario posee balance positivo.")
+    else:
+        print("Los usuarios que mas ganaron son:")
+        for usuario in usuario_que_mas_gano:
+            print(f"{usuario[0]} con ${usuario[1]}")
 
 def main() -> None:
     diccionario_equipos = {451: 'Boca JRS', 434: 'Gimnasia (LP)', 435: 'River Plate', 436: 'Racing Club', 437: 'Rosario Central', 438: 'Vélez Sarsfield', 439: 'Godoy cruz',

@@ -1,36 +1,8 @@
 import random
 import requests
 import csv
-<<<<<<< HEAD
-
-def obtener_fixture() -> dict:
-    headers = {'x-rapidapi-host': "v3.football.api-sports.io", 'x-rapidapi-key': "ef7e9b83b25359c08ef9f5135245bf8d"}
-    params = {"league":"128","season": 2023}
-    url = "https://v3.football.api-sports.io/fixtures"
-    return requests.get(url, params=params, headers=headers).json()["response"] #['fixture'],["league"]["round"], ['teams'][home or away]["id","name","logo","winner":bool]
-
-def obtener_lista_partidos(respuesta, id_equipo_a_buscar) -> list:
-    lista_partidos = []
-    for i in range(len(respuesta)):
-        if id_equipo_a_buscar == respuesta[i]["teams"]["home"]["id"]:
-            print(respuesta[i]["league"]["round"])
-            ronda = str(respuesta[i]["league"]["round"])
-            if len(ronda)==14:
-                numero_fecha = int(ronda[0] + ronda[12] + ronda[13])
-            else: numero_fecha = int(ronda[0] + "0" + ronda[12])
-            lista_partidos.append([numero_fecha, respuesta[i]["teams"]["away"]["name"], "(L)", respuesta[i]["fixture"]["id"]])
-        elif id_equipo_a_buscar == respuesta[i]["teams"]["away"]["id"]:
-            ronda = str(respuesta[i]["league"]["round"])
-            if len(ronda)==14:
-                numero_fecha = int(ronda[0] + ronda[12] + ronda[13])
-            else:
-                numero_fecha = int(ronda[0] + "0" + ronda[12])
-            lista_partidos.append([numero_fecha, respuesta[i]["teams"]["home"]["name"], "(V)", respuesta[i]["fixture"]["id"]])
-    return sorted(lista_partidos)
-=======
 import os
 
->>>>>>> Joa
 
 def busca_fixture(dicc_equipos):
     lista_equipos = [*dicc_equipos.values()]
@@ -50,75 +22,6 @@ def busca_fixture(dicc_equipos):
     respuesta = obtener_fixture()
     #Armo Lista de Partidos
     lista_partidos = obtener_lista_partidos(respuesta, id_equipo_a_buscar)
-<<<<<<< HEAD
-    return lista_partidos, id_equipo_a_buscar
-
-def elije_partido(dinero_disponible_usuario, dicc_equipos, lista_partidos, id_equipo):
-    #Imprimo Fixture
-    print(f"El fixture de {dicc_equipos[id_equipo]} en este campeonato es:")
-    print("------PRIMERA FASE------")
-    centena_fase = 100
-    for partido in lista_partidos:
-        print(f"{partido[0]-centena_fase}-", partido[1], partido[2])
-        if partido[0] == 127: 
-            print("------SEGUNDA FASE------")
-            centena_fase = 200
-    #Pido Partido a apostar
-    print("Si desea aostar a un partido de la primera fase escriba ´1´ y si desea apostar para uno de la segunda fase escriba ´2´")
-    fase = validador_num(input_num())
-    if fase ==1: centena_fase = 100 #No pongo el caso de que sea 2 ya que centena fase ya vale 200 desde el for anterior
-    print("Escriba el número del partido en el cual quiere realizar su apuesta: ", end="")
-    partido_a_apostar = input_num() + centena_fase
-    while not(partido_a_apostar>100 and partido_a_apostar<127) and not(partido_a_apostar>200 and partido_a_apostar<214) and (partido_a_apostar - centena_fase)<27:
-        #Chequeo que el partido este en los intervalos de partidos de cada fase (primera fase tiene 27 partidos y segunda fase  14)
-        #Tambien chequeo que el ingreso del usuario no sea lo suficientemente mayor como para entrar en el rango de la segunda fase si pone por ejemplo primera fase y partido 110
-        print("Ingreso inválido. Ingrese uno de los numeros colocados entre las opciones antes mostradas: ", end="")
-        partido_a_apostar = input_num()
-        partido_a_apostar += centena_fase #Sumo 100 o 200 para saber a que fase quiere apostar el usuario y poder buscar el partido correcto (De ultima podemos sacar lo de las fases porque puede ser un quilombo)
-    #Busca id del partido a apostar
-    id_partido = busca_id_partido(lista_partidos, partido_a_apostar)
-    #Pido a que equipo desea apostar
-    print("En caso de querer apostar por el local ingrese 1, en caso de apostar por un empate ingrese 2, y en caso de apostar por el visitante ingrese 3 \n")
-    apuesta = validador_num(input_num(), [1,2,3])
-    #VALIDAR EL INGRESO DEL USUARIO
-    print("Escriba la cantidad de dinero que desea apostar: ", end="")
-    dinero_apostado = input_num()
-    #Validar que el usuario cuente con ese dinero
-    while dinero_apostado > dinero_disponible_usuario:
-        print(f"No cuenta con esa cantidad de dinero en la cuenta. Su plata actual es {dinero_disponible_usuario}.\nIngresé su apuesta: ", end="")
-        dinero_apostado = input_num()
-    return dinero_apostado, apuesta, id_partido
-
-def busca_id_partido(lista_partidos, partido_apostado):
-    if partido_apostado<200: 
-        fase = "1st"
-        partido_apostado -= 100
-    else: 
-        fase = "2nd"
-        partido_apostado -= 200
-    for i in lista_partidos:
-        if i[0] == f"{fase} Phase - {partido_apostado}":
-            return i[2]
-
-def main_apuestas(): #abierto a cambio de nombre, lo cambie para que no sea parecido a una variable
-    dicc_equipos = {451: 'Boca JRS', 434: 'Gimnasia (LP)', 435: 'River Plate', 436: 'Racing Club', 437: 'Rosario Central', 438: 'Vélez Sarsfield', 439: 'Godoy cruz',
-    440: 'Belgrano (Cba)', 441: 'Unión de Santa Fé', 442: 'Defensa y Justicia', 445: 'Huracán', 446: 'Lanús', 448: 'Colón de Santa Fé', 449: 'Banfield', 450: 'Estudiantes (LP)', 452: 'Tigre',
-    453: 'Independiente', 455: 'Atlético Tucumán', 456: 'Talleres (Cba)', 457: 'Newells Old Boys', 458: 'Argentinos JRS', 459: 'Arsenal de Sarandí', 460: 'San Lorenzo', 474: 'Sarmiento (J)',
-    478: 'Instituto (Cba)', 1064: 'Platense', 4065: 'Central Córdoba (SdE)', 2434: 'Barracas Central'}
-    usuario = {'prueba@gmail.com': ['Prueba', '$pbkdf2-sha256$29000$ZGxN6Z2zdi5lrPVeS6l1bg$Mq3DdwiQoYcOoZLHF.nYBb5vIMWs8dK3RqCE5zXiajQ', '120', 'DDMMYYYY', '290']}
-    dinero_disponible_usuario: float = float([*usuario.values()][0][4])
-    lista_partidos, id_equipo = busca_fixture(dicc_equipos)
-    print(id_equipo)
-    dinero_apostado, apuesta, id_partido = elije_partido(dinero_disponible_usuario, dicc_equipos, lista_partidos, id_equipo)
-    win_or_draw:bool = obtener_win_or_draw(id_partido, apuesta)
-    #TO-DO Buscar win or draw con el id del partido y ver si la apuesta coincide con el win or draw
-    ganancia = resolver_apuesta(dinero_apostado, apuesta, win_or_draw)
-    cargar_dinero(usuario, ganancia)
-    if(ganancia > 0):
-        crear_nueva_transaccion([*usuario.keys()][0], obtener_fecha(), "Gana", str(ganancia))
-    else:
-        crear_nueva_transaccion([*usuario.keys()][0], obtener_fecha(), "Pierde", str(ganancia))
-=======
     
     return lista_partidos, id_equipo_a_buscar
 
@@ -234,7 +137,6 @@ def busca_id_partido(lista_partidos, partido_apostado, fase):
 
 def obtener_win_or_draw():
     pass
->>>>>>> Joa
 
 #No incluyo el partido porque entiendo que no nos interesa para saber cuanto gana, lo unico que nos
 #interesa es saber es si el win or draw es true y si se apuesta por el local/empate/visitante
@@ -280,9 +182,6 @@ def resolver_apuesta(dinero_apostado:float, apuesta:int, win_or_draw:bool):
             ganancia = -dinero_apostado
     return ganancia
 
-<<<<<<< HEAD
-#FUNCIONES QUE YA ESTAN EN JUGARSELA:PY
-=======
 
 def main_apuestas(): #abierto a cambio de nombre, lo cambie para que no sea parecido a una variable
     print("TO-DO: EXPLICACION DE APUESTAS")
@@ -300,6 +199,10 @@ def main_apuestas(): #abierto a cambio de nombre, lo cambie para que no sea pare
     #TO-DO Buscar win or draw con el id del partido y ver si la apuesta coincide con el win or draw
     ganancia = resolver_apuesta(dinero_apostado, apuesta, win_or_draw)
     cargar_dinero(usuario, ganancia)
+    if(ganancia > 0):
+        crear_nueva_transaccion([*usuario.keys()][0], obtener_fecha(), "Gana", str(ganancia))
+    else:
+        crear_nueva_transaccion([*usuario.keys()][0], obtener_fecha(), "Pierde", str(ganancia))
 
 
 
@@ -307,7 +210,6 @@ def main_apuestas(): #abierto a cambio de nombre, lo cambie para que no sea pare
 
 #FUNCIONES QUE YA ESTAN EN JUGARSELA:PY
 
->>>>>>> Joa
 def cargar_dinero(usuario: dict, cantidad_a_cargar: int) -> None:
     usuarios_existentes: dict = obtener_usuarios_existentes()
     email: str = list(usuario.keys())[0]
@@ -366,8 +268,6 @@ def input_float() -> float:
         numero = input("El valor ingresado debe ser un número. Inténtelo nuevamente: ")
     numero = float(numero)
     return numero
-<<<<<<< HEAD
-=======
 
 def input_alfa() -> str:
     """
@@ -389,7 +289,6 @@ def validador_str(valor:str, valores:list) -> str:
         valor = input_alfa()
     return valor
 
->>>>>>> Joa
 main_apuestas()
 
 """def MostrarFixtureViejo():

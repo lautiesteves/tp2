@@ -5,7 +5,11 @@ import matplotlib.pyplot as plt
 from passlib.hash import pbkdf2_sha256
 from datetime import datetime
 
-def es_float(num) -> bool:
+def es_float(num: str) -> bool:
+    """
+    PRE: Recibe un string
+    POST: Devuelve True si puede ser convertido a float.
+    """
     try:
         float(num)
         return True
@@ -13,6 +17,10 @@ def es_float(num) -> bool:
         return False
 
 def input_float() -> float:
+    """
+    PRE: -
+    POST: Devuelve un valor numérico float.
+    """
     numero = input("")
     while not es_float(numero):
         numero = input("El valor ingresado debe ser un número. Inténtelo nuevamente.\n$ ")
@@ -22,7 +30,7 @@ def input_float() -> float:
 def input_num() -> int:
     """
     PRE: -
-    POST: Devuelve un valor numérico.
+    POST: Devuelve un valor numérico int.
     """
     numero = input("")
     while numero.isnumeric() != True:
@@ -331,6 +339,10 @@ def mail_validado() -> str:
     return mail
 
 def obtener_usuarios_existentes() -> dict:
+    """
+    PRE: Supone que hay al menos un usuario guardado.
+    POST: Devuelve un dict con todos los usuarios.
+    """
     usuarios_existentes: dict = {}
     with open('usuarios.csv', newline='') as usuariosCsv:
         csvReader = csv.reader(usuariosCsv, delimiter = ",")
@@ -340,6 +352,10 @@ def obtener_usuarios_existentes() -> dict:
     return usuarios_existentes
 
 def obtener_transacciones_existentes() -> list:
+    """
+    PRE: Supone que hay al menos una transaccion guardada.
+    POST: Devuelve un dict con todas las transacciones.
+    """
     transacciones_existentes: list = []
     with open('transacciones.csv', newline='') as transaccionesCsv:
         csvReader = csv.reader(transaccionesCsv, delimiter = ",")
@@ -349,6 +365,10 @@ def obtener_transacciones_existentes() -> list:
     return transacciones_existentes
 
 def pedir_data_inicio_sesion() -> list:
+    """
+    PRE: -
+    POST: Devuelve una lista con email y contraseña ingresados.
+    """
     #Pido e-mail y contraseña.
     email: str = mail_validado()
     contrasena: str = input("Ingrese su contraseña: ")
@@ -358,6 +378,10 @@ def pedir_data_inicio_sesion() -> list:
 
 #Asume que existe un Usuario con el email
 def obtener_usuario(email: str) -> dict:
+    """
+    PRE: Supone que existe un usuario con cuyo id coincide con el string ingresado
+    POST: Devuelve un dict con el usuario buscado.
+    """
     usuarios: dict = obtener_usuarios_existentes()
     for id in usuarios:
         if email == id:
@@ -365,6 +389,11 @@ def obtener_usuario(email: str) -> dict:
 
 #Asume que no existe un Usuario con el email
 def crear_nuevo_usuario(data_inicio_sesion: list) -> None:
+    """
+    PRE: Recibe una lista con email, contraseña y nombre de usuario.
+        Supone que no hay un usuario cuyo id coincide con el email ingresado.
+    POST: Devuelve un dict con todos los usuarios.
+    """
     usuarios_existentes: dict = obtener_usuarios_existentes()
     contrasena_encriptada: str = pbkdf2_sha256.hash(data_inicio_sesion[1])
     with open('usuarios.csv', 'w', newline='') as usuariosCsv:
@@ -375,6 +404,10 @@ def crear_nuevo_usuario(data_inicio_sesion: list) -> None:
         csvWriter.writerow((data_inicio_sesion[0], data_inicio_sesion[2], contrasena_encriptada, "0", obtener_fecha(), "0"))
 
 def crear_nueva_transaccion(id_usuario: str, fecha: str, tipo: str, importe: float) -> None:
+    """
+    PRE: Recibe la informacion de la transaccion a crear.
+    POST: -
+    """
     transacciones_existentes: list = obtener_transacciones_existentes()
     with open('transacciones.csv', 'w', newline='') as transaccionesCsv:
         csvWriter = csv.writer(transaccionesCsv, delimiter = ",", quotechar = '"', quoting = csv.QUOTE_NONNUMERIC)
@@ -385,6 +418,11 @@ def crear_nueva_transaccion(id_usuario: str, fecha: str, tipo: str, importe: flo
 
 #TO-DO: Agregar pregunta al usuario, si el mail existe... desea loguearse con el mismo?.
 def crear_usuario() -> dict:
+    """
+    Lógica para crear un nuevo usuario.
+    PRE: -
+    POST: Devuelve un dict con el usuario creado.
+    """
     #Busco Usuarios existentes
     usuarios_existentes: dict = obtener_usuarios_existentes()
     #Pido usuario y contraseña
@@ -409,12 +447,21 @@ def crear_usuario() -> dict:
     return usuario
 
 def verificar_contrasena(contrasena_encriptada: str, contrasena_ingresada:str) -> bool:
+    """
+    PRE: Recibe la contraseña encriptada guardada en usuarios.csv y la ingresada por el usuario.
+    POST: Devuelve True si verifica.
+    """
     if(pbkdf2_sha256.verify(contrasena_ingresada, contrasena_encriptada)):
         return True
     return False
 
 #TO-DO: Agregar opcion de dejar al usuario volver para atras para registrar un mail.
 def ingresar_usuario() -> dict:
+    """
+    Lógica para iniciar sesion con un usuario existente.
+    PRE: -
+    POST: Devuelve un dict con el usuario creado.
+    """
     usuarios_existentes: dict = obtener_usuarios_existentes()
     #Pido usuario y contraseña
     data_inicio_sesion: list = pedir_data_inicio_sesion()
@@ -435,11 +482,6 @@ def ingresar_usuario() -> dict:
     print("-"*25)
     input("Presione enter para ingresar al menú.")
     return usuario
-
-def verificar_contrasena(contrasena_encriptada: str, contrasena_ingresada:str) -> bool:
-    if(pbkdf2_sha256.verify(contrasena_ingresada, contrasena_encriptada)):
-        return True
-    return False
 
 #Recibe un dict con todos los usuarios actualizados
 def modificar_usuario(usuarios_actualizados: dict) -> None:
@@ -476,12 +518,6 @@ def cargar_dinero(usuario: dict, cantidad_a_cargar: float) -> None:
     print("-"*25)
     modificar_usuario(usuarios_existentes)
 
-#def obtener_usuario(email: str) -> dict:
- #   usuarios_existentes: dict = obtener_usuarios_existentes()
-  #  for id in usuarios_existentes:
-   #     if(id == email):
-    #        return usuarios_existentes[email]
-
 def iniciar_sesion() -> dict:
     print("-"*38)
     print("a. Iniciar sesión.\nb. Crear nuevo usuario.")
@@ -499,6 +535,7 @@ def iniciar_sesion() -> dict:
 #Siempre va a haber al menos un usuario
 #Puede ser que todos los usuarios no hayan apostado (todos 0$)
 def mostrar_usuario_que_mas_aposto() -> None:
+    
     os.system("cls")
     usuarios_existentes: dict = obtener_usuarios_existentes()
     mayor_monto_apostado: float = 0.0

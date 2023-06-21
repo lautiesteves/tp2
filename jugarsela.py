@@ -237,9 +237,15 @@ def mostrar_grafico_goles(dicc_equipos:dict):
     params ={"league":128,"season":año_liga,"team":id_equipo}
     url = "https://v3.football.api-sports.io/teams/statistics"
     respuesta = requests.get(url, params=params, headers=headers).json()["response"]["goals"]["for"]
-    numeros_porcentajes= []
-    porcentajes =[] #["0-15"],["16-30"],["31-45"],["46-60"],["61-75"],["76-90"],["91-105"],["106-120"] ej: ['31.58%', '10.53%', '10.53%', '15.79%', '10.53%', '15.79%', '5.26%', None]
+    porcentajes = [] #["0-15"],["16-30"],["31-45"],["46-60"],["61-75"],["76-90"],["91-105"],["106-120"] ej: ['31.58%', '10.53%', '10.53%', '15.79%', '10.53%', '15.79%', '5.26%', None]
     porcentajes_str = ""
+<<<<<<< Updated upstream
+=======
+    numeros_porcentajes= []
+    os.system("cls")
+    print("-----",dicc_equipos[id_equipo].upper(),"-----")
+    print(f"Temporada: {año_liga}")
+>>>>>>> Stashed changes
     print("Goles a favor:", respuesta["total"]["total"])
     input("Presione enter para abrir el gráfico")
     for minutos in respuesta["minute"]:

@@ -3,6 +3,7 @@ import os
 import csv
 import matplotlib.pyplot as plt
 from passlib.hash import pbkdf2_sha256
+from datetime import datetime
 
 def es_float(num) -> bool:
     try:
@@ -338,6 +339,15 @@ def obtener_usuarios_existentes() -> dict:
             usuarios_existentes[row[0]] = [row[1],row[2],row[3],row[4], row[5]]
     return usuarios_existentes
 
+def obtener_transacciones_existentes() -> dict:
+    transacciones_existentes: dict = {}
+    with open('transacciones.csv', newline='') as transaccionesCsv:
+        csvReader = csv.reader(transaccionesCsv, delimiter = ",")
+        next(csvReader)
+        for row in csvReader:
+            transacciones_existentes[row[0]] = [row[1],row[2],row[3]]
+    return transacciones_existentes
+
 def pedir_data_inicio_sesion() -> list:
     #Pido e-mail y contraseña.
     email: str = mail_validado()
@@ -362,7 +372,16 @@ def crear_nuevo_usuario(data_inicio_sesion: list) -> None:
         csvWriter.writerow(("ID Usuario", "Nombre Usuario", "Contraseña", "Dinero Apostado", "Fecha Última Apuesta", "Dinero Disponible"))
         for id in usuarios_existentes:
             csvWriter.writerow((id, usuarios_existentes[id][0], usuarios_existentes[id][1], usuarios_existentes[id][2], usuarios_existentes[id][3], usuarios_existentes[id][4]))
-        csvWriter.writerow((data_inicio_sesion[0], data_inicio_sesion[2], contrasena_encriptada, "0", "DDMMYYYY", "0"))
+        csvWriter.writerow((data_inicio_sesion[0], data_inicio_sesion[2], contrasena_encriptada, "0", obtener_fecha(), "0"))
+
+def crear_nueva_transaccion(id_usuario: str, fecha: str, tipo: str, importe: float) -> None:
+    transacciones_existentes: dict = obtener_transacciones_existentes()
+    with open('transacciones.csv', 'w', newline='') as transaccionesCsv:
+        csvWriter = csv.writer(transaccionesCsv, delimiter = ",", quotechar = '"', quoting = csv.QUOTE_NONNUMERIC)
+        csvWriter.writerow(("ID Usuario", "Fecha de Transaccion", "Tipo de Resultado", "Importe"))
+        for id in transacciones_existentes:
+            csvWriter.writerow((id, transacciones_existentes[id][0], transacciones_existentes[id][1], transacciones_existentes[id][2]))
+        csvWriter.writerow((id_usuario, fecha, tipo, importe))
 
 #TO-DO: Agregar pregunta al usuario, si el mail existe... desea loguearse con el mismo?.
 def crear_usuario() -> dict:
@@ -440,7 +459,11 @@ def resolver_carga_dinero(usuario: dict) -> None:
         print("$ ", end = "")
         cantidad_a_cargar: float = input_float()
     cargar_dinero(usuario, cantidad_a_cargar)
-    
+    crear_nueva_transaccion([*usuario.keys()][0], obtener_fecha(), "Deposito", str(cantidad_a_cargar))
+
+def obtener_fecha() -> str:
+    return datetime.today().strftime('%Y%m%d')
+
 def cargar_dinero(usuario: dict, cantidad_a_cargar: float) -> None:
     usuarios_existentes: dict = obtener_usuarios_existentes()
     email: str = list(usuario.keys())[0]

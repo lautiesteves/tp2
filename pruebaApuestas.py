@@ -84,11 +84,6 @@ def elije_partido(dinero_disponible_usuario, lista_partidos):
     for i in range(rango):
         lista_fechas.append(i+1)
     partido_a_apostar = str(validador_num(input_num(), lista_fechas))
-    """if fase == 1:
-        partido_a_apostar = str(validador_num(input_num(), [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27]))
-    else:
-        partido_a_apostar = str(validador_num(input_num(), [1,2,3,4,5,6,7,8,9,10,11,12,13,14]))
-    """
     id_partido, eq_local, eq_visitante = busca_id_partido(lista_partidos, partido_a_apostar, fase)
     #Pido a que equipo desea apostar
     os.system("cls")

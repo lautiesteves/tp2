@@ -139,7 +139,7 @@ def mostrar_plantel(dicc_equipos:dict) -> None:
     equipo = validador_num(input_num(), lista_opciones)
     
     id_equipo = lista_equipos_ids[equipo-1]
-    headers = {'x-rapidapi-host': "v3.football.api-sports.io", 'x-rapidapi-key': "ef7e9b83b25359c08ef9f5135245bf8d"}
+    headers = {'x-rapidapi-host': "v3.football.api-sports.io", 'x-rapidapi-key': "48c2478c1579ac4b33ad98f65b37fbce"}
     params ={"league":"128", "season": 2023, "team": id_equipo}
     url = "https://v3.football.api-sports.io/players"
     paginas_respuesta = requests.get(url, params=params, headers=headers).json()["paging"]
@@ -177,7 +177,7 @@ def mostrar_tabla() -> None:
     print("Ingrese el año de la temporada que desea conocer: ", end="")
     año_liga = int(validador_num(input_num(), años_ligas))
 
-    headers = {'x-rapidapi-host': "v3.football.api-sports.io", 'x-rapidapi-key': "ef7e9b83b25359c08ef9f5135245bf8d"}
+    headers = {'x-rapidapi-host': "v3.football.api-sports.io", 'x-rapidapi-key': "48c2478c1579ac4b33ad98f65b37fbce"}
     params = {"league":"128", "season": año_liga}
     url = "https://v3.football.api-sports.io/standings"
     respuesta = requests.get(url, params=params, headers=headers).json()["response"][0]["league"]["standings"][0]
@@ -238,7 +238,7 @@ def mostrar_estadio_y_escudo(dicc_equipos:dict):
     equipo_a_buscar = validador_num(input_num(), lista_opciones)
 
     id_equipo_a_buscar = lista_equipos_ids[equipo_a_buscar-1]
-    headers = {'x-rapidapi-host': "v3.football.api-sports.io", 'x-rapidapi-key': "ef7e9b83b25359c08ef9f5135245bf8d"}
+    headers = {'x-rapidapi-host': "v3.football.api-sports.io", 'x-rapidapi-key': "48c2478c1579ac4b33ad98f65b37fbce"}
     params ={"league":"128","season": 2023}
     url = "https://v3.football.api-sports.io/teams"
 
@@ -274,6 +274,7 @@ def mostrar_grafico_goles(dicc_equipos:dict):
     print("-"*20)
     print("Ingrese el año de la temporada que desea conocer: ", end="")
     año_liga = (validador_num(input_num(), años_ligas))
+    os.system("cls")
     print("Equipos de la Liga Profesional Argentina:")
     for i in range(len(lista_equipos)):
         lista_opciones.append(i+1)
@@ -284,7 +285,7 @@ def mostrar_grafico_goles(dicc_equipos:dict):
 
     id_equipo = (lista_equipos_ids[equipo-1])
 
-    headers = {'x-rapidapi-host': "v3.football.api-sports.io", 'x-rapidapi-key': "ef7e9b83b25359c08ef9f5135245bf8d"}
+    headers = {'x-rapidapi-host': "v3.football.api-sports.io", 'x-rapidapi-key': "48c2478c1579ac4b33ad98f65b37fbce"}
     params ={"league":128,"season":año_liga,"team":id_equipo}
     url = "https://v3.football.api-sports.io/teams/statistics"
     respuesta = requests.get(url, params=params, headers=headers).json()["response"]["goals"]["for"]
@@ -582,21 +583,22 @@ def mostrar_usuario_que_mas_aposto() -> None:
         print(f"Monto apostado: ${[*usuarios_que_mas_apostaron.values()][0][2]}")
         print("-"*28)
 
-def obtener_balance_usuarios() -> dict:
-    balance_usuarios: dict = {}
+def obtener_cant_victorias_usuarios() -> dict:
     transacciones_existentes: list = obtener_transacciones_existentes()
     balance_usuarios: dict = {}
+    victorias_usuarios:dict = {}
     for transaccion in transacciones_existentes:
-        usuario: dict = obtener_usuario(transaccion[0])
-        nombre_de_usuario: str = usuario[transaccion[0]][0]
-        if transaccion[0] not in [*balance_usuarios.keys()]:
+        """usuario: dict = obtener_usuario(transaccion[0])
+        nombre_de_usuario: str = usuario[transaccion[0]][0]"""
+        nombre_de_usuario = [*obtener_usuario(transaccion[0]).values()][0]
+        if transaccion[0] not in [victorias_usuarios.keys()]:
             balance_usuarios = balance_usuarios | {nombre_de_usuario: float(transaccion[3])}
         else:
             balance_usuarios[nombre_de_usuario] += float(transaccion[3])
     return balance_usuarios
 
 def mostrar_usuario_que_mas_gano() -> None:
-    balance_usuarios: dict = obtener_balance_usuarios()
+    balance_usuarios: dict = obtener_cant_victorias_usuarios()
     usuario_que_mas_gano: list = [["", 0]]
     for nombre_de_usuario in balance_usuarios:
         if balance_usuarios[nombre_de_usuario] > usuario_que_mas_gano[0][1]:
@@ -633,7 +635,7 @@ def busca_fixture(dicc_equipos):
     return lista_partidos, id_equipo_a_buscar
 
 def obtener_fixture() -> dict:
-    headers = {'x-rapidapi-host': "v3.football.api-sports.io", 'x-rapidapi-key': "ef7e9b83b25359c08ef9f5135245bf8d"}
+    headers = {'x-rapidapi-host': "v3.football.api-sports.io", 'x-rapidapi-key': "48c2478c1579ac4b33ad98f65b37fbce"}
     params = {"league":"128","season": 2023, "from":"2023-01-15", "to":"2023-08-10"}
     url = "https://v3.football.api-sports.io/fixtures"
     return requests.get(url, params=params, headers=headers).json()["response"] #['fixture'],["league"]["round"], ['teams'][home or away]["id","name","logo","winner":bool]
@@ -645,7 +647,7 @@ def busca_partidos_no_jugados(lista_partidos):
 
 
 def obtener_wod(id:str)->bool: #SIEMPRE VA A DAR EL WIN_OR_DRAW DEL LOCAL
-    headers = {'x-rapidapi-host': "v3.football.api-sports.io", 'x-rapidapi-key': "ef7e9b83b25359c08ef9f5135245bf8d"}
+    headers = {'x-rapidapi-host': "v3.football.api-sports.io", 'x-rapidapi-key': "48c2478c1579ac4b33ad98f65b37fbce"}
     params = {"fixture":id}
     url = "https://v3.football.api-sports.io/predictions"
     respuesta = requests.get(url, params=params, headers=headers).json()["response"][0]
@@ -875,6 +877,7 @@ def main() -> None:
             input("Pulse enter para continuar.")
         
         menu_principal(usuario)
+        print("Ingrese una opción del menú: ", end="")
         opcion = validador_str(input_alfa(), ["a","b","c","d","e","f","g","h","i"])
     
     print("Saliste de la Aplicación")

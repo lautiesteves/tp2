@@ -275,7 +275,9 @@ def mostrar_grafico_goles(dicc_equipos:dict):
     print(f"Temporada: {año_liga}")
     print("Goles a favor:", respuesta["total"]["total"])
     print("-"*25)
-    input("Presione enter para abrir el gráfico")
+
+    print("Presione enter para abrir el gráfico.")
+    input("Cierre el gráfico para volver a la aplicación.")
     
     
     for minutos in respuesta["minute"]:
@@ -570,13 +572,14 @@ def obtener_balance_usuarios() -> dict:
             balance_usuarios = balance_usuarios | {nombre_de_usuario: float(transaccion[3])}
         else:
             balance_usuarios[nombre_de_usuario] += float(transaccion[3])
+    return balance_usuarios
 
 def mostrar_usuario_que_mas_gano() -> None:
     balance_usuarios: dict = obtener_balance_usuarios()
     usuario_que_mas_gano: list = [["", 0]]
     for nombre_de_usuario in balance_usuarios:
         if balance_usuarios[nombre_de_usuario] > usuario_que_mas_gano[0][1]:
-            usuario_que_mas_gano = [nombre_de_usuario, balance_usuarios[nombre_de_usuario]]
+            usuario_que_mas_gano = [[nombre_de_usuario, balance_usuarios[nombre_de_usuario]]]
         elif balance_usuarios[nombre_de_usuario] == usuario_que_mas_gano[0][1] and balance_usuarios[nombre_de_usuario] > 0:
             usuario_que_mas_gano.append([nombre_de_usuario, balance_usuarios[nombre_de_usuario]])
     if usuario_que_mas_gano[0] == "":

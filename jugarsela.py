@@ -124,8 +124,9 @@ def mostrar_plantel(dicc_equipos:dict) -> None:
     """
     lista_equipos_ids = [*dicc_equipos.keys()]
     lista_equipos = [*dicc_equipos.values()]
+    respuesta = []
     lista_opciones = []
-    
+    page = 0
     print("Equipos de la Liga Profesional Argentina:")
     for i in range(len(lista_equipos)):
         lista_opciones.append(i+1)
@@ -133,17 +134,24 @@ def mostrar_plantel(dicc_equipos:dict) -> None:
     print("-"*20)
     print("Ingrese de que equipo desea buscar su plantel: ", end="")
     equipo = validador_num(input_num(), lista_opciones)
-
+    
     id_equipo = lista_equipos_ids[equipo-1]
     headers = {'x-rapidapi-host': "v3.football.api-sports.io", 'x-rapidapi-key': "ef7e9b83b25359c08ef9f5135245bf8d"}
     params ={"league":"128", "season": 2023, "team": id_equipo}
     url = "https://v3.football.api-sports.io/players"
-    
-    respuesta = requests.get(url, params=params, headers=headers).json()["response"]
+    paginas_respuesta = requests.get(url, params=params, headers=headers).json()["paging"]
+    total_pages = paginas_respuesta["total"]
+    while page < total_pages:
+        page += 1
+        params["page"] = page
+        respuesta_2 = requests.get(url, params=params, headers=headers).json()["response"]
+        for i in respuesta_2:
+            respuesta.append(i)
     os.system("cls")
     
     print(f"Plantel de {lista_equipos[equipo-1]}:")
     print("-"*40)
+
     for i in range(len(respuesta)):
         apellido = (respuesta[i]["player"]["lastname"]).split()
         nombre = (respuesta[i]["player"]["firstname"]).split()

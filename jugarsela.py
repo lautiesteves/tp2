@@ -585,35 +585,37 @@ def mostrar_usuario_que_mas_aposto() -> None:
 
 def obtener_cant_victorias_usuarios() -> dict:
     transacciones_existentes: list = obtener_transacciones_existentes()
-    balance_usuarios: dict = {}
     victorias_usuarios:dict = {}
     for transaccion in transacciones_existentes:
-        """usuario: dict = obtener_usuario(transaccion[0])
-        nombre_de_usuario: str = usuario[transaccion[0]][0]"""
-        """nombre_de_usuario = [*obtener_usuario(transaccion[0]).values()][0]"""
         if transaccion[2] == "Gana":
-            if transaccion[0] not in [victorias_usuarios.keys()]:
+            if transaccion[0] not in [*victorias_usuarios.keys()]:
                 victorias_usuarios[transaccion[0]] = 1
             else:
                 victorias_usuarios[transaccion[0]] += 1
-    
-    return balance_usuarios
+
+    return victorias_usuarios
 
 def mostrar_usuario_que_mas_gano() -> None:
-    balance_usuarios: dict = obtener_cant_victorias_usuarios()
+    balance_usuarios: dict = obtener_cant_victorias_usuarios() # {mail:cantidad_veces_ganadas(int)}
     usuario_que_mas_gano: list = [["", 0]]
-    for nombre_de_usuario in balance_usuarios:
-        if balance_usuarios[nombre_de_usuario] > usuario_que_mas_gano[0][1]:
-            usuario_que_mas_gano = [[nombre_de_usuario, balance_usuarios[nombre_de_usuario]]]
-        elif balance_usuarios[nombre_de_usuario] == usuario_que_mas_gano[0][1] and balance_usuarios[nombre_de_usuario] > 0:
-            usuario_que_mas_gano.append([nombre_de_usuario, balance_usuarios[nombre_de_usuario]])
-    if usuario_que_mas_gano[0] == "":
-        print("Ningun usuario posee balance positivo.")
+    for mail in balance_usuarios:
+        if balance_usuarios[mail] > usuario_que_mas_gano[0][1]:
+            usuario_que_mas_gano = [[mail, balance_usuarios[mail]]]
+        elif balance_usuarios[mail] == usuario_que_mas_gano[0][1] and balance_usuarios[mail] > 0:
+            usuario_que_mas_gano.append([mail, balance_usuarios[mail]])
+       
+    if usuario_que_mas_gano[0][0] == "":
+        print("Ningun usuario ganó apuestas aún.")
     else:
         print("Los usuarios que mas ganaron son:")
+        print("-"*33)
         for usuario in usuario_que_mas_gano:
-            print(f"{usuario[0]} con ${usuario[1]}")
-
+            dict_usuario = obtener_usuario(usuario[0])
+            nombre_de_usuario = [*dict_usuario.values()][0][0]
+            print(f" - {nombre_de_usuario}")
+        print("-"*28)
+        print(f"Cantidad de apuestas exitosas: {usuario_que_mas_gano[0][1]}")
+        print("-"*28)
 
 def busca_fixture(dicc_equipos):
     lista_equipos = [*dicc_equipos.values()]

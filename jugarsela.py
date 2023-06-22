@@ -590,11 +590,13 @@ def obtener_cant_victorias_usuarios() -> dict:
     for transaccion in transacciones_existentes:
         """usuario: dict = obtener_usuario(transaccion[0])
         nombre_de_usuario: str = usuario[transaccion[0]][0]"""
-        nombre_de_usuario = [*obtener_usuario(transaccion[0]).values()][0]
-        if transaccion[0] not in [victorias_usuarios.keys()]:
-            balance_usuarios = balance_usuarios | {nombre_de_usuario: float(transaccion[3])}
-        else:
-            balance_usuarios[nombre_de_usuario] += float(transaccion[3])
+        """nombre_de_usuario = [*obtener_usuario(transaccion[0]).values()][0]"""
+        if transaccion[2] == "Gana":
+            if transaccion[0] not in [victorias_usuarios.keys()]:
+                victorias_usuarios[transaccion[0]] = 1
+            else:
+                victorias_usuarios[transaccion[0]] += 1
+    
     return balance_usuarios
 
 def mostrar_usuario_que_mas_gano() -> None:

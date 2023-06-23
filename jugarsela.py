@@ -8,7 +8,7 @@ import io
 from passlib.hash import pbkdf2_sha256
 from datetime import datetime
 
-def es_float(num: str) -> bool:
+def es_float(num:str) -> bool:
     """
     PRE: Recibe un string
     POST: Devuelve True si puede ser convertido a float.
@@ -72,8 +72,11 @@ def validador_str(valor:str, valores:list) -> str:
     return valor
 
 def espacios_menu (nombre:str, dinero:str) -> int:
+    """
+    PRE: Ingresa el nombre de usuario y su dinero.
+    POST: Devuelve la cantidad de puntos (.) de separación entre los mismo. Es solo una función para darle estética al menú.
+    """
     cantidad_espacios = 33 - len(nombre) - len(dinero)
-    
     if cantidad_espacios > 0:
         espacios = (" "*cantidad_espacios)
     else:
@@ -91,7 +94,7 @@ def menu_principal(usuario) -> None:
     espacios = espacios_menu(nombre, dinero)
     os.system("cls")
     print("------------ MENU PRINCIPAL ------------")
-    print(f"User: {nombre}{espacios}${dinero}")   #TO-DO: Agregar que mida el espacio entre "usuario" y "dinero", segun el "len()" de cada uno
+    print(f"User: {nombre}{espacios}${dinero}")
     print("-"*40)
     print("a. Mostrar plantel completo de un equipo (temporada 2023).")
     print("b. Mostrar tabla para una temporada.")
@@ -120,26 +123,35 @@ def posicion_jugador(pos:str) -> str:
     
     return pos
 
+def imprimir_equipos_LPA(lista_equipos:list) -> list:
+    """
+    PRE: Entra una lista de los equipos de la LPA
+    POST: Imprime los equipos para el usuario y devuelve una lista de las opciones (numericas) posibles a elegir.
+    """
+    lista_opciones = []
+    print("Equipos de la Liga Profesional Argentina:")
+    print("-"*20)
+    for i in range(len(lista_equipos)):
+        lista_opciones.append(i+1)
+        print(f"{i+1}. {lista_equipos[i]}")
+    print("-"*20)
+    return lista_opciones
+
 def mostrar_plantel(dicc_equipos:dict) -> None:
     """
-    PRE: Ingresan una lista de los equipos de la LPA y otra lista con sus respectivos IDs. 
+    PRE: Ingresa un diccionario con los equipos de la LPA y sus respectivos IDs.
     POST: Imprime el plantel de jugadores del equipo que indique el usuario.
     """
     lista_equipos_ids = [*dicc_equipos.keys()]
     lista_equipos = [*dicc_equipos.values()]
     respuesta = []
-    lista_opciones = []
     page = 0
-    print("Equipos de la Liga Profesional Argentina:")
-    for i in range(len(lista_equipos)):
-        lista_opciones.append(i+1)
-        print(f"{i+1}. {lista_equipos[i]}")
-    print("-"*20)
+    lista_opciones = imprimir_equipos_LPA(lista_equipos)
     print("Ingrese de que equipo desea buscar su plantel: ", end="")
     equipo = validador_num(input_num(), lista_opciones)
     
     id_equipo = lista_equipos_ids[equipo-1]
-    headers = {'x-rapidapi-host': "v3.football.api-sports.io", 'x-rapidapi-key': "48c2478c1579ac4b33ad98f65b37fbce"}
+    headers = {'x-rapidapi-host': "v3.football.api-sports.io", 'x-rapidapi-key': "827b3d5d7a5cfec03074a4fbe415dc37"}
     params ={"league":"128", "season": 2023, "team": id_equipo}
     url = "https://v3.football.api-sports.io/players"
     paginas_respuesta = requests.get(url, params=params, headers=headers).json()["paging"]
@@ -177,11 +189,10 @@ def mostrar_tabla() -> None:
     print("Ingrese el año de la temporada que desea conocer: ", end="")
     año_liga = int(validador_num(input_num(), años_ligas))
 
-    headers = {'x-rapidapi-host': "v3.football.api-sports.io", 'x-rapidapi-key': "48c2478c1579ac4b33ad98f65b37fbce"}
+    headers = {'x-rapidapi-host': "v3.football.api-sports.io", 'x-rapidapi-key': "827b3d5d7a5cfec03074a4fbe415dc37"}
     params = {"league":"128", "season": año_liga}
     url = "https://v3.football.api-sports.io/standings"
     respuesta = requests.get(url, params=params, headers=headers).json()["response"][0]["league"]["standings"][0]
-    #STANDINGS[season][team]←indices de listas : ['rank', 'team', 'points', 'goalsDiff', 'group', 'form', 'status', 'description', 'all', 'home', 'away', 'update']
     os.system("cls")
     print(f"--- Liga Profesional Argentina {año_liga} ---")
     iterador = 0
@@ -200,7 +211,7 @@ def mostrar_imagen(respuesta:dict, escudo_estadio:int) -> None:
     PRE: Ingresa la información de la API y un int (puede ser 1 o 2) que sirve de referencia para saber que imagen se va a imprimir. 
     POST: Imprime el escudo o el estadio del equipo ingresante.
     """
-    escudo = respuesta["team"]["logo"]   #Ver si se puede imprimir el escudo en lugar de una url
+    escudo = respuesta["team"]["logo"]
     estadio = respuesta["venue"]["image"]
     nombre_estadio = respuesta["venue"]["name"]
     capacidad_estadio = respuesta["venue"]["capacity"]
@@ -208,7 +219,7 @@ def mostrar_imagen(respuesta:dict, escudo_estadio:int) -> None:
     if escudo_estadio == 1: #IMPRIME ESCUDO
         link = escudo
         titulo = respuesta["team"]["name"]
-    else: #IMPRIME ESTADIO
+    else:                   #IMPRIME ESTADIO
         link = estadio
         titulo = f"{nombre_estadio}\nCapacidad: {capacidad_estadio} espectadores"
     
@@ -219,26 +230,19 @@ def mostrar_imagen(respuesta:dict, escudo_estadio:int) -> None:
     plt.title(titulo)
     plt.show()
 
-
-def mostrar_estadio_y_escudo(dicc_equipos:dict):
+def mostrar_estadio_y_escudo(dicc_equipos:dict) -> None:
     """
-    PRE: Ingresan una lista de los equipos de la LPA y otra lista con sus respectivos IDs. 
+    PRE: Ingresa un diccionario con los equipos de la LPA y sus respectivos IDs. 
     POST: Imprime información sobre el club que indique el usuario.
     """
     lista_equipos_ids = [*dicc_equipos.keys()]
     lista_equipos = [*dicc_equipos.values()]    
-    lista_opciones = []
-    
-    print("Equipos de la Liga Profesional Argentina:")
-    for i in range(len(lista_equipos)):
-        lista_opciones.append(i+1)
-        print(f"{i+1}. {lista_equipos[i]}")
-    print("-"*20)
+    lista_opciones = imprimir_equipos_LPA(lista_equipos)
     print("Ingrese el equipo del que desea obtener información sobre el estadio: ", end="")
     equipo_a_buscar = validador_num(input_num(), lista_opciones)
 
     id_equipo_a_buscar = lista_equipos_ids[equipo_a_buscar-1]
-    headers = {'x-rapidapi-host': "v3.football.api-sports.io", 'x-rapidapi-key': "48c2478c1579ac4b33ad98f65b37fbce"}
+    headers = {'x-rapidapi-host': "v3.football.api-sports.io", 'x-rapidapi-key': "827b3d5d7a5cfec03074a4fbe415dc37"}
     params ={"league":"128","season": 2023}
     url = "https://v3.football.api-sports.io/teams"
 
@@ -262,30 +266,12 @@ def mostrar_estadio_y_escudo(dicc_equipos:dict):
             if respuesta[i]["venue"]["surface"] == "grass": print("Superficie: Césped")
             print("-"*40)
 
-
-def mostrar_grafico_goles(dicc_equipos:dict):
-    lista_equipos_ids = [*dicc_equipos.keys()]
-    lista_equipos = [*dicc_equipos.values()]   
-    lista_opciones = []
-    años_ligas = [2015,2016,2017,2018,2019,2020,2021,2022,2023]
-    print("Temporadas de la Liga Profesional Argentina:")
-    for año in años_ligas:
-        print(f" - {año}")
-    print("-"*20)
-    print("Ingrese el año de la temporada que desea conocer: ", end="")
-    año_liga = (validador_num(input_num(), años_ligas))
-    os.system("cls")
-    print("Equipos de la Liga Profesional Argentina:")
-    for i in range(len(lista_equipos)):
-        lista_opciones.append(i+1)
-        print(f"{i+1}. {lista_equipos[i]}")
-    print("-"*20)
-    print("Ingrese de que equipo desea buscar sus estadísticas de goles: ", end="")
-    equipo = (validador_num(input_num(), lista_opciones))
-
-    id_equipo = (lista_equipos_ids[equipo-1])
-
-    headers = {'x-rapidapi-host': "v3.football.api-sports.io", 'x-rapidapi-key': "48c2478c1579ac4b33ad98f65b37fbce"}
+def output_mostrar_grafico_goles(dicc_equipos:dict, año_liga:int, id_equipo:int) -> None:
+    """
+    PRE: Ingresa un diccionario con los equipos de la LPA y sus respectivos IDs y los parametros de la API. 
+    POST: Imprime el gráfico de los goles del equipo seleccionado en la temporada 2023.
+    """    
+    headers = {'x-rapidapi-host': "v3.football.api-sports.io", 'x-rapidapi-key': "827b3d5d7a5cfec03074a4fbe415dc37"}
     params ={"league":128,"season":año_liga,"team":id_equipo}
     url = "https://v3.football.api-sports.io/teams/statistics"
     respuesta = requests.get(url, params=params, headers=headers).json()["response"]["goals"]["for"]
@@ -297,11 +283,9 @@ def mostrar_grafico_goles(dicc_equipos:dict):
     print(f"Temporada: {año_liga}")
     print("Goles a favor:", respuesta["total"]["total"])
     print("-"*25)
-
     print("Presione enter para abrir el gráfico.")
     input("Cierre el gráfico para volver a la aplicación.")
-    
-    
+        
     for minutos in respuesta["minute"]:
         porcentajes.append(respuesta["minute"][minutos]["percentage"])
     for i in range(len(porcentajes)):
@@ -323,7 +307,32 @@ def mostrar_grafico_goles(dicc_equipos:dict):
     plt.bar(x,y, linewidth=2, edgecolor="black")
     plt.show()
 
+def mostrar_grafico_goles(dicc_equipos:dict) -> None:
+    """
+    PRE: Ingresa un diccionario con los equipos de la LPA y sus respectivos IDs. 
+    POST: Valida los inputs de las elecciones del usuario y los manda a otra función para que se impriman.
+    """
+    lista_equipos_ids = [*dicc_equipos.keys()]
+    lista_equipos = [*dicc_equipos.values()]   
+    años_ligas = [2015,2016,2017,2018,2019,2020,2021,2022,2023]
+    print("Temporadas de la Liga Profesional Argentina:")
+    for año in años_ligas:
+        print(f" - {año}")
+    print("-"*20)
+    print("Ingrese el año de la temporada que desea conocer: ", end="")
+    año_liga = (validador_num(input_num(), años_ligas))
+    os.system("cls")
+    lista_opciones = imprimir_equipos_LPA(lista_equipos)
+    print("Ingrese de que equipo desea buscar sus estadísticas de goles: ", end="")
+    equipo = (validador_num(input_num(), lista_opciones))
+    id_equipo = (lista_equipos_ids[equipo-1])
+    output_mostrar_grafico_goles(dicc_equipos, año_liga, id_equipo)
+
 def mail_validado() -> str:
+    """
+    PRE: - 
+    POST: Valida y devuelve el input del usuario si cumple con un formato de mail (que no acepta puntos en el nombre o servicio de mail, unicamente acepta ".com").
+    """
     os.system("cls")
     print("El mail debe cumplir las siguientes condiciones:")
     print("-"*25)
@@ -350,10 +359,9 @@ def mail_validado() -> str:
         return mail_validado()
 
     usuario, correo, com  = mail_spliteado[0], mail_spliteado[1].split(".")[0], mail_spliteado[1].split(".")[1]
-    #condiciones (booleanos)
-    cond1 = usuario.isalnum()
-    cond2 = correo.isalnum()
-    cond3 = com == "com"
+    cond1:bool = usuario.isalnum()
+    cond2:bool = correo.isalnum()
+    cond3:bool = com == "com"
 
     if cond1 != True or cond2 != True or cond3 != True:
         print(f"{mail} es un mail inválido.")
@@ -378,7 +386,7 @@ def obtener_usuarios_existentes() -> dict:
 def obtener_transacciones_existentes() -> list:
     """
     PRE: Supone que hay al menos una transaccion guardada.
-    POST: Devuelve un dict con todas las transacciones.
+    POST: Devuelve una lista con todas las transacciones.
     """
     transacciones_existentes: list = []
     with open('transacciones.csv', newline='') as transaccionesCsv:
@@ -393,17 +401,15 @@ def pedir_data_inicio_sesion() -> list:
     PRE: -
     POST: Devuelve una lista con email y contraseña ingresados.
     """
-    #Pido e-mail y contraseña.
     email: str = mail_validado()
     contrasena: str = input("Ingrese su contraseña: ")
     while contrasena == '':
         contrasena = input("Ingrese su contraseña: ")
     return [email, contrasena]
 
-#Asume que existe un Usuario con el email
-def obtener_usuario(email: str) -> dict:
+def obtener_usuario(email:str) -> dict:
     """
-    PRE: Supone que existe un usuario con cuyo id coincide con el string ingresado
+    PRE: Supone que existe un usuario con cuyo id coincide con el string ingresado.
     POST: Devuelve un dict con el usuario buscado.
     """
     usuarios: dict = obtener_usuarios_existentes()
@@ -411,12 +417,13 @@ def obtener_usuario(email: str) -> dict:
         if email == id:
             return {email: usuarios[id]}
 
-#Asume que no existe un Usuario con el email
-def crear_nuevo_usuario(data_inicio_sesion: list) -> None:
+def obtener_fecha() -> str:
+    return datetime.today().strftime('%Y%m%d')
+
+def crear_nuevo_usuario(data_inicio_sesion:list) -> None:
     """
-    PRE: Recibe una lista con email, contraseña y nombre de usuario.
-        Supone que no hay un usuario cuyo id coincide con el email ingresado.
-    POST: Devuelve un dict con todos los usuarios.
+    PRE: Recibe una lista con email, contraseña y nombre de usuario. Supone que no hay un usuario cuyo id coincide con el email ingresado.
+    POST: Guarda los datos en el CSV de Usuarios.
     """
     usuarios_existentes: dict = obtener_usuarios_existentes()
     contrasena_encriptada: str = pbkdf2_sha256.hash(data_inicio_sesion[1])
@@ -425,12 +432,12 @@ def crear_nuevo_usuario(data_inicio_sesion: list) -> None:
         csvWriter.writerow(("ID Usuario", "Nombre Usuario", "Contraseña", "Dinero Apostado", "Fecha Última Apuesta", "Dinero Disponible"))
         for id in usuarios_existentes:
             csvWriter.writerow((id, usuarios_existentes[id][0], usuarios_existentes[id][1], usuarios_existentes[id][2], usuarios_existentes[id][3], usuarios_existentes[id][4]))
-        csvWriter.writerow((data_inicio_sesion[0], data_inicio_sesion[2], contrasena_encriptada, "0", obtener_fecha(), "0"))
+        csvWriter.writerow((data_inicio_sesion[0], data_inicio_sesion[2], contrasena_encriptada, "0", "DDMMYYYY", "0"))
 
-def crear_nueva_transaccion(id_usuario: str, fecha: str, tipo: str, importe: float) -> None:
+def crear_nueva_transaccion(id_usuario:str, fecha:str, tipo:str, importe:float) -> None:
     """
     PRE: Recibe la informacion de la transaccion a crear.
-    POST: -
+    POST: Guarda la transacción en el CSV de transacciones.
     """
     transacciones_existentes: list = obtener_transacciones_existentes()
     with open('transacciones.csv', 'w', newline='') as transaccionesCsv:
@@ -440,10 +447,8 @@ def crear_nueva_transaccion(id_usuario: str, fecha: str, tipo: str, importe: flo
             csvWriter.writerow((transaccion[0], transaccion[1], transaccion[2], transaccion[3]))
         csvWriter.writerow((id_usuario, fecha, tipo, importe))
 
-#TO-DO: Agregar pregunta al usuario, si el mail existe... desea loguearse con el mismo?.
 def crear_usuario() -> dict:
     """
-    Lógica para crear un nuevo usuario.
     PRE: -
     POST: Devuelve un dict con el usuario creado.
     """
@@ -470,7 +475,7 @@ def crear_usuario() -> dict:
     input("Presione enter para ingresar al menú.")
     return usuario
 
-def verificar_contrasena(contrasena_encriptada: str, contrasena_ingresada:str) -> bool:
+def verificar_contrasena(contrasena_encriptada:str, contrasena_ingresada:str) -> bool:
     """
     PRE: Recibe la contraseña encriptada guardada en usuarios.csv y la ingresada por el usuario.
     POST: Devuelve True si verifica.
@@ -479,12 +484,10 @@ def verificar_contrasena(contrasena_encriptada: str, contrasena_ingresada:str) -
         return True
     return False
 
-#TO-DO: Agregar opcion de dejar al usuario volver para atras para registrar un mail.
 def ingresar_usuario() -> dict:
     """
-    Lógica para iniciar sesion con un usuario existente.
     PRE: -
-    POST: Devuelve un dict con el usuario creado.
+    POST: Devuelve un dict con el usuario ingresado.
     """
     usuarios_existentes: dict = obtener_usuarios_existentes()
     #Pido usuario y contraseña
@@ -507,15 +510,22 @@ def ingresar_usuario() -> dict:
     input("Presione enter para ingresar al menú.")
     return usuario
 
-#Recibe un dict con todos los usuarios actualizados
-def modificar_usuario(usuarios_actualizados: dict) -> None:
+def modificar_usuario(usuarios_actualizados:dict) -> None:
+    """
+    PRE: Recibe un dict con todos los usuarios actualizados.
+    POST: Devuelve un dict con el usuario ingresado.
+    """
     with open('usuarios.csv', 'w', newline='') as usuariosCsv:
         csvWriter = csv.writer(usuariosCsv, delimiter = ",", quotechar = '"', quoting = csv.QUOTE_NONNUMERIC)
         csvWriter.writerow(("ID Usuario", "Nombre Usuario", "Contraseña", "Dinero Apostado", "Fecha Última Apuesta", "Dinero Disponible"))
         for id in usuarios_actualizados:
             csvWriter.writerow((id, usuarios_actualizados[id][0], usuarios_actualizados[id][1], usuarios_actualizados[id][2], usuarios_actualizados[id][3], usuarios_actualizados[id][4]))
 
-def resolver_carga_dinero(usuario: dict) -> None:
+def resolver_carga_dinero(usuario:dict) -> None:
+    """
+    PRE: Recibe un diccionario de un usuario.
+    POST: Deriva a las funciones que le carga dinero al usuario y crea la transacción de depósito en el CSV.
+    """
     print("Ingrese el dinero a cargar a su cuenta:")
     print("-"*25)
     print("$ ", end = "")
@@ -527,10 +537,11 @@ def resolver_carga_dinero(usuario: dict) -> None:
     cargar_dinero(usuario, cantidad_a_cargar)
     crear_nueva_transaccion([*usuario.keys()][0], obtener_fecha(), "Deposito", str(cantidad_a_cargar))
 
-def obtener_fecha() -> str:
-    return datetime.today().strftime('%Y%m%d')
-
-def cargar_dinero(usuario: dict, cantidad_a_cargar: float) -> None:
+def cargar_dinero(usuario:dict, cantidad_a_cargar:float) -> None:
+    """
+    PRE: Recibe un diccionario de un usuario y la cantidad de dinero a cargar.
+    POST: Le carga dinero al usuario en el diccionario.
+    """
     usuarios_existentes: dict = obtener_usuarios_existentes()
     email: str = list(usuario.keys())[0]
     dinero_disponible = float(usuarios_existentes[email][4])
@@ -543,6 +554,10 @@ def cargar_dinero(usuario: dict, cantidad_a_cargar: float) -> None:
     modificar_usuario(usuarios_existentes)
 
 def iniciar_sesion() -> dict:
+    """
+    PRE: -
+    POST: Menú de inicio de sesión. Devuelve un diccionario con el usuario que ingresó al programa.
+    """
     print("-"*38)
     print("a. Iniciar sesión.\nb. Crear nuevo usuario.")
     print("-"*38)
@@ -556,10 +571,11 @@ def iniciar_sesion() -> dict:
         usuario: dict = crear_usuario()
     return usuario
 
-#Siempre va a haber al menos un usuario
-#Puede ser que todos los usuarios no hayan apostado (todos 0$)
 def mostrar_usuario_que_mas_aposto() -> None:
-    
+    """
+    PRE: -
+    POST: Busca información del CSV de Usuarios y muestra el que más dinero haya apostado.
+    """
     os.system("cls")
     usuarios_existentes: dict = obtener_usuarios_existentes()
     mayor_monto_apostado: float = 0.0
@@ -584,7 +600,11 @@ def mostrar_usuario_que_mas_aposto() -> None:
         print("-"*28)
 
 def obtener_cant_victorias_usuarios() -> dict:
-    transacciones_existentes: list = obtener_transacciones_existentes()
+    """
+    PRE: -
+    POST: Busca información del CSV de transacciones y devuelve un diccionario de key "mail" y value "cantidad_veces_ganadas(int)".
+    """
+    transacciones_existentes:list = obtener_transacciones_existentes()
     victorias_usuarios:dict = {}
     for transaccion in transacciones_existentes:
         if transaccion[2] == "Gana":
@@ -596,6 +616,10 @@ def obtener_cant_victorias_usuarios() -> dict:
     return victorias_usuarios
 
 def mostrar_usuario_que_mas_gano() -> None:
+    """
+    PRE: -
+    POST: Muestra en pantalla que usuario/s ganaron más apuestas.
+    """
     balance_usuarios: dict = obtener_cant_victorias_usuarios() # {mail:cantidad_veces_ganadas(int)}
     usuario_que_mas_gano: list = [["", 0]]
     for mail in balance_usuarios:
@@ -617,16 +641,15 @@ def mostrar_usuario_que_mas_gano() -> None:
         print(f"Cantidad de apuestas exitosas: {usuario_que_mas_gano[0][1]}")
         print("-"*28)
 
-def busca_fixture(dicc_equipos):
+def busca_fixture(dicc_equipos:dict) -> tuple:
+    """
+    PRE: Ingresa un diccionario con los equipos de la LPA y sus respectivos IDs.
+    POST: Devuelve una tupla con la lista de partidos del fixture 2023 para el equipo seleccionado y el ID del equipo ingresado por el usuario.
+    """    
     lista_equipos = [*dicc_equipos.values()]
     lista_equipos_ids = [*dicc_equipos.keys()]
-    lista_opciones = []
     #Imprimo equipos
-    print("Equipos de la Liga Profesional Argentina:")
-    for i in range(len(lista_equipos)):
-        lista_opciones.append(i+1)
-        print(f"{i+1}. {lista_equipos[i]}")
-    print("-"*20)
+    lista_opciones = imprimir_equipos_LPA(lista_equipos)
     print("Ingrese el equipo del que desea obtener información sobre el fixture: ", end="")
     #Pido a usuario el Equipo
     equipo_a_buscar = validador_num(input_num(), lista_opciones)
@@ -639,19 +662,21 @@ def busca_fixture(dicc_equipos):
     return lista_partidos, id_equipo_a_buscar
 
 def obtener_fixture() -> dict:
-    headers = {'x-rapidapi-host': "v3.football.api-sports.io", 'x-rapidapi-key': "48c2478c1579ac4b33ad98f65b37fbce"}
+    """
+    PRE: -
+    POST: Devuelve un diccionario con el fixture de la API para la season 2023 fase 1.
+    """  
+    headers = {'x-rapidapi-host': "v3.football.api-sports.io", 'x-rapidapi-key': "827b3d5d7a5cfec03074a4fbe415dc37"}
     params = {"league":"128","season": 2023, "from":"2023-01-15", "to":"2023-08-10"}
     url = "https://v3.football.api-sports.io/fixtures"
     return requests.get(url, params=params, headers=headers).json()["response"] #['fixture'],["league"]["round"], ['teams'][home or away]["id","name","logo","winner":bool]
 
-
-def busca_partidos_no_jugados(lista_partidos):
-    estado = lista_partidos[2]["status"]["short"]
-    lista_partidos.append(estado)
-
-
 def obtener_wod(id:str)->bool: #SIEMPRE VA A DAR EL WIN_OR_DRAW DEL LOCAL
-    headers = {'x-rapidapi-host': "v3.football.api-sports.io", 'x-rapidapi-key': "48c2478c1579ac4b33ad98f65b37fbce"}
+    """
+    PRE: Ingresa el id del partido a buscar.
+    POST: Devuelve un booleano, siempre refiriendose al equipo local. Ej.: Si es true, el local tiene win_or_draw = true.
+    """  
+    headers = {'x-rapidapi-host': "v3.football.api-sports.io", 'x-rapidapi-key': "827b3d5d7a5cfec03074a4fbe415dc37"}
     params = {"fixture":id}
     url = "https://v3.football.api-sports.io/predictions"
     respuesta = requests.get(url, params=params, headers=headers).json()["response"][0]
@@ -661,7 +686,11 @@ def obtener_wod(id:str)->bool: #SIEMPRE VA A DAR EL WIN_OR_DRAW DEL LOCAL
         wod = not respuesta["predictions"]["win_or_draw"]
     return wod
 
-def obtener_lista_partidos(fixture, id_equipo_a_buscar) -> list:
+def obtener_lista_partidos(fixture:dict, id_equipo_a_buscar:int) -> list:
+    """
+    PRE: Ingresa el fixture completo 2023 y el ID del equipo a buscar.
+    POST: Devuelve una lista del fixture 2023 con los partidos del equipo seleccionado.
+    """  
     lista_partidos = []
     for i in range(len(fixture)):
         localias = ["home", "away"]
@@ -677,9 +706,11 @@ def obtener_lista_partidos(fixture, id_equipo_a_buscar) -> list:
 
     return sorted(lista_partidos) # Ordenado por fase y fecha. Ej "15" , teams , estado (FT y otros), wod(bool)
 
-
-
-def imprimir_fixture(dicc_equipos:dict, lista_partidos:list, id_equipo:str):
+def imprimir_fixture(dicc_equipos:dict, lista_partidos:list, id_equipo:str) -> None:
+    """
+    PRE: Ingresa el diccionario de equipos de la LPA con sus IDs, la lista de partidos obtenida del fixture y el ID del equipo seleccionado.
+    POST: Imprime el fixture para que el usuario elija a qué partido apostar.
+    """  
     os.system("cls")
     print("FIXTURE DE {}".format(dicc_equipos[id_equipo].upper()))
     print(" "*8,"<LOCAL>"," "*67,"<VISITANTE>")
@@ -707,9 +738,11 @@ def imprimir_fixture(dicc_equipos:dict, lista_partidos:list, id_equipo:str):
                 puntitos1 = "."*(33 - (len(local)))
             print("Fecha {}.{} {}{}vs{}{} {}".format(partido[0], local, paga_local, puntitos1, puntitos2, visitante, paga_visitante))
 
-
-
-def elije_partido(dinero_disponible_usuario, lista_partidos) -> tuple:
+def elije_partido(dinero_disponible_usuario:float, lista_partidos:list) -> tuple:
+    """
+    PRE: Ingresa el dinero disponible del usuario y la lista de partidos del fixture.
+    POST: Devuelve una tupla con el dinero apostado, la eleccion de la apuesta y el partido al que apostó.
+    """  
     #Pido Partido a apostar
     partidos_restantes:list = []
     for partido in lista_partidos:
@@ -755,10 +788,23 @@ def elije_partido(dinero_disponible_usuario, lista_partidos) -> tuple:
     print("-"*25)
     return dinero_apostado, apuesta, partido_a_apostar
 
+def wod_partido(lista_partidos:list, partido_a_apostar:str) -> tuple:
+    """
+    PRE: Ingresa la lista de partidos del fixture y el partido a apostar.
+    POST: Devuelve una tupla con un booleano que indica si el win_or_draw es true o false para el LOCAL y devuelve una tupla con el equipo local en el índice [0] y el visitante en el [1].
+    """  
+    for partido in lista_partidos:
+        if int(partido[0]) == int(partido_a_apostar):
+            local = partido[1]["home"]["name"]
+            visitante = partido[1]["away"]["name"]
+            equipos = local, visitante
+            return partido[3], equipos
 
-#No incluyo el partido porque entiendo que no nos interesa para saber cuanto gana, lo unico que nos
-#interesa es saber es si el win or draw es true y si se apuesta por el local/empate/visitante
 def resolver_apuesta(dinero_apostado:float, apuesta:int, win_or_draw:bool, nombres:tuple) -> float: #EL WIN OR DRAW ES DEL EQUIPO LOCAL
+    """
+    PRE: Ingresa el dinero apostado, la eleccion de la apuesta, el win_or_draw del equipo local y una tupla con el nombre del equipo local y el del visitante.
+    POST: Devuelve la ganancia del usuario (puede ser positiva o negativa según el resultado).
+    """  
     #Dado simula resultado:
     #1 -> Gana Local
     #2 -> Empate
@@ -802,33 +848,57 @@ def resolver_apuesta(dinero_apostado:float, apuesta:int, win_or_draw:bool, nombr
             ganancia = -dinero_apostado
     return ganancia
 
-
-def wod_partido(lista_partidos:list, partido_a_apostar:str) -> tuple:
-    for partido in lista_partidos:
-        if int(partido[0]) == int(partido_a_apostar):
-            local = partido[1]["home"]["name"]
-            visitante = partido[1]["away"]["name"]
-            equipos = local, visitante
-            return partido[3], equipos
-
-
-def main_apuestas(): #abierto a cambio de nombre, lo cambie para que no sea parecido a una variable
-    print("TO-DO: EXPLICACION DE APUESTAS")
+def imprimir_menu_apuestas() -> None:
+    """
+    PRE: .
+    POST: Imprime el menú de las apuestas para dar instrucciones al usuario.
+    """    
+    print("----------- MENU APUESTAS -----------")
+    print("1. Se mostrarán los equipos de la LPA y deberá elegir alguno para conocer su fixture")
+    print("2. Se imprimirá el fixture del equipo seleccionado y se mostrarán las pagas por cada apuesta (multiplicador)")
+    print("3. Deberá ingresar a qué <partido>, qué <monto> y qué <resultado> desea apostar")
+    print("-"*37)
+    print(" - La ganancia será mayor si apuesta al equipo con menos chances de ganar")
+    print(" - En caso de no acertar al resultado, perderá todo el dinero apostado")
+    print("-"*37)
     input("Presione enter para comenzar.")
-    dicc_equipos = {451: 'Boca JRS', 434: 'Gimnasia (LP)', 435: 'River Plate', 436: 'Racing Club', 437: 'Rosario Central', 438: 'Vélez Sarsfield', 439: 'Godoy cruz',
-    440: 'Belgrano (Cba)', 441: 'Unión de Santa Fé', 442: 'Defensa y Justicia', 445: 'Huracán', 446: 'Lanús', 448: 'Colón de Santa Fé', 449: 'Banfield', 450: 'Estudiantes (LP)', 452: 'Tigre',
-    453: 'Independiente', 455: 'Atlético Tucumán', 456: 'Talleres (Cba)', 457: 'Newells Old Boys', 458: 'Argentinos JRS', 459: 'Arsenal de Sarandí', 460: 'San Lorenzo', 474: 'Sarmiento (J)',
-    478: 'Instituto (Cba)', 1064: 'Platense', 4065: 'Central Córdoba (SdE)', 2434: 'Barracas Central'}
-    usuario = {'prueba@gmail.com': ['Prueba', '$pbkdf2-sha256$29000$ZGxN6Z2zdi5lrPVeS6l1bg$Mq3DdwiQoYcOoZLHF.nYBb5vIMWs8dK3RqCE5zXiajQ', '120', 'DDMMYYYY', '290']}
-    dinero_disponible_usuario: float = float([*usuario.values()][0][4])
+
+def actualizar_usuarios(usuario:dict, ganancia:float, dinero_apostado:float) -> None:
+    """
+    PRE: Ingresa el usuario logeado, la ganancia de la apuesta y el dinero apostado.
+    POST: Modifica 3 parametros del diccionario y actualiza el CSV.
+    """
+    usuarios_existentes: dict = obtener_usuarios_existentes()
+    email: str = list(usuario.keys())[0]
+    #Modifico Dinero disponible
+    dinero_disponible = float(usuarios_existentes[email][4])
+    usuarios_existentes[email][4] = str(dinero_disponible + ganancia)
+    usuario[email][4] = str(dinero_disponible + ganancia)
+    #Modifico Fecha última apuesta
+    usuarios_existentes[email][3] = obtener_fecha()
+    usuario[email][3] = obtener_fecha()
+    #Modifico Dinero apostado
+    dinero_apostado_total = float(usuarios_existentes[email][2])
+    usuarios_existentes[email][2] = str(dinero_apostado_total + dinero_apostado)
+    usuario[email][2] = str(dinero_apostado_total + dinero_apostado)
+    modificar_usuario(usuarios_existentes)
+
+def main_apuestas(dicc_equipos:dict, usuario:dict) -> None:
+    """
+    PRE: Ingresa el diccionario de equipos de la LPA con sus IDs y el usuario logeado.
+    POST: Es la función main que organiza y gestiona todo el punto de "apuestas".
+    """  
+    imprimir_menu_apuestas()
+    os.system("cls")
+    dinero_disponible_usuario:float = float([*usuario.values()][0][4])
     lista_partidos, id_equipo = busca_fixture(dicc_equipos)
     imprimir_fixture(dicc_equipos, lista_partidos, id_equipo)
     dinero_apostado, apuesta, partido_a_apostar = elije_partido(dinero_disponible_usuario, lista_partidos)
     win_or_draw, equipos = wod_partido(lista_partidos, partido_a_apostar)
     ganancia = resolver_apuesta(dinero_apostado, apuesta, win_or_draw, equipos)
     print("-"*30)
-    print(f"{ganancia}\nGANAMOS EL MUNDIAL")
-    cargar_dinero(usuario, ganancia)
+    input("Presione enter para volver al menú principal.")
+    actualizar_usuarios(usuario, ganancia, dinero_apostado)
     if(ganancia > 0):
         crear_nueva_transaccion([*usuario.keys()][0], obtener_fecha(), "Gana", str(ganancia))
     else:
@@ -843,8 +913,6 @@ def main() -> None:
     
     print("--------Bienvenido a Jugársela--------")
     input("Pulse Enter para iniciar la aplicación")
-    #Login
-    
     usuario: dict = iniciar_sesion()
     # ↓↓↓↓ USUARIO PARA PROBAR PUNTOS QUE NO TENGAN QUE VER CON APUESTAS Y TARIFAS ↓↓↓↓
     #usuario: dict = {'uma@gmail.com': ['Mofletes', '$pbkdf2-sha256$29000$ba1VqhUiJCQEQGgtJWQMoQ$KwNC.BSCTTMZhIEqXjkShUWe7HY1mh9OHsNfIQ1twK8', '0', 'DDMMYYYY', '0']}
@@ -877,15 +945,16 @@ def main() -> None:
             mostrar_usuario_que_mas_gano()
             input("Pulse enter para continuar.")
         elif(opcion == 'h'):
-            main_apuestas()
-            input("Pulse enter para continuar.")
+            main_apuestas(diccionario_equipos, usuario)
         
         menu_principal(usuario)
         print("Ingrese una opción del menú: ", end="")
         opcion = validador_str(input_alfa(), ["a","b","c","d","e","f","g","h","i"])
-    
+    os.system("cls")
     print("Saliste de la Aplicación")
+    print("-"*34)
+    print(f"Hasta la próxima {[*usuario.values()][0][0]}!\nGracias por apostar con Jugársela!")
+    print("-"*34)
+    input("")
 
 main()
-
-#Prueba

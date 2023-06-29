@@ -706,7 +706,7 @@ def obtener_lista_partidos(fixture:dict, id_equipo_a_buscar:int) -> list:
 
     return sorted(lista_partidos) # Ordenado por fase y fecha. Ej "15" , teams , estado (FT y otros), wod(bool)
 
-def imprimir_fixture(dicc_equipos:dict, lista_partidos:list, id_equipo:str) -> None:
+def imprimir_fixture(dicc_equipos:dict, lista_partidos:list, id_equipo:str, multiplicador:int) -> None:
     """
     PRE: Ingresa el diccionario de equipos de la LPA con sus IDs, la lista de partidos obtenida del fixture y el ID del equipo seleccionado.
     POST: Imprime el fixture para que el usuario elija a qué partido apostar.
@@ -728,15 +728,15 @@ def imprimir_fixture(dicc_equipos:dict, lista_partidos:list, id_equipo:str) -> N
         if partido[2] == "FT":
             print("Fecha {}.{}{}vs{}{} - TERMINADO".format(partido[0], local, puntitos1, puntitos2, visitante))
         else:
+            puntitos1 = "."*(40 - (len(local)))
             if partido[3]:
-                paga_local = "+MULT(10%)"
-                paga_visitante = "+ MULT(100%)"
-                puntitos1 = "."*(34 - (len(local)))
+                paga_local = f"x{round(float(multiplicador*0.1),1)}"
+                paga_visitante = f"x{round(float(multiplicador), 1)}"
             else: 
-                paga_local = "+MULT(100%)"
-                paga_visitante = "+ MULT(10%)"
-                puntitos1 = "."*(33 - (len(local)))
+                paga_local = f"x{round(float(multiplicador), 1)}"
+                paga_visitante = f"x{round(float(multiplicador*0.1),1)}"
             print("Fecha {}.{} {}{}vs{}{} {}".format(partido[0], local, paga_local, puntitos1, puntitos2, visitante, paga_visitante))
+    print("Aclaración!! En caso de realizarse una apuesta por un empate se podrá obtener una ganancia de 0.5 de lo apostado.")
 
 def elije_partido(dinero_disponible_usuario:float, lista_partidos:list) -> tuple:
     """
@@ -748,7 +748,7 @@ def elije_partido(dinero_disponible_usuario:float, lista_partidos:list) -> tuple
     for partido in lista_partidos:
         if partido[2] != "FT": partidos_restantes.append(int(partido[0]))
     print("-"*25)
-    print("Escriba el numero de la fecha del partido (sin definir) donde quiere realizar su apuesta: ", end="")
+    print("Escriba el numero de la fecha del partido (sin definir) en el cual quiere realizar su apuesta: ", end="")
     partido_a_apostar = str(validador_num(input_num(), partidos_restantes))
     for i in range(len(lista_partidos)):
         if lista_partidos[i][0] == partido_a_apostar:
@@ -800,7 +800,7 @@ def wod_partido(lista_partidos:list, partido_a_apostar:str) -> tuple:
             equipos = local, visitante
             return partido[3], equipos
 
-def resolver_apuesta(dinero_apostado:float, apuesta:int, win_or_draw:bool, nombres:tuple) -> float: #EL WIN OR DRAW ES DEL EQUIPO LOCAL
+def resolver_apuesta(dinero_apostado:float, apuesta:int, win_or_draw:bool, nombres:tuple, multiplicador:int) -> float: #EL WIN OR DRAW ES DEL EQUIPO LOCAL
     """
     PRE: Ingresa el dinero apostado, la eleccion de la apuesta, el win_or_draw del equipo local y una tupla con el nombre del equipo local y el del visitante.
     POST: Devuelve la ganancia del usuario (puede ser positiva o negativa según el resultado).
@@ -809,9 +809,7 @@ def resolver_apuesta(dinero_apostado:float, apuesta:int, win_or_draw:bool, nombr
     #1 -> Gana Local
     #2 -> Empate
     #3 -> Gana Visitante
-    dado = 3 #random.randint(1,3)
-    #TO-DO Resolver cantidad ganancia con win_or_draw
-    multiplicador = random.randint(2,4)
+    dado = random.randint(1,3)
     if (apuesta == 1 and win_or_draw==True) or (apuesta == 3 and win_or_draw==False):
         multiplicador = multiplicador*0.1
     #Dado == 2 da Empate
@@ -887,15 +885,16 @@ def main_apuestas(dicc_equipos:dict, usuario:dict) -> None:
     """
     PRE: Ingresa el diccionario de equipos de la LPA con sus IDs y el usuario logeado.
     POST: Es la función main que organiza y gestiona todo el punto de "apuestas".
-    """  
+    """
+    multiplicador = random.randint(2,4)  
     imprimir_menu_apuestas()
     os.system("cls")
     dinero_disponible_usuario:float = float([*usuario.values()][0][4])
     lista_partidos, id_equipo = busca_fixture(dicc_equipos)
-    imprimir_fixture(dicc_equipos, lista_partidos, id_equipo)
+    imprimir_fixture(dicc_equipos, lista_partidos, id_equipo, multiplicador)
     dinero_apostado, apuesta, partido_a_apostar = elije_partido(dinero_disponible_usuario, lista_partidos)
     win_or_draw, equipos = wod_partido(lista_partidos, partido_a_apostar)
-    ganancia = resolver_apuesta(dinero_apostado, apuesta, win_or_draw, equipos)
+    ganancia = resolver_apuesta(dinero_apostado, apuesta, win_or_draw, equipos, multiplicador)
     print("-"*30)
     input("Presione enter para volver al menú principal.")
     actualizar_usuarios(usuario, ganancia, dinero_apostado)
@@ -903,7 +902,6 @@ def main_apuestas(dicc_equipos:dict, usuario:dict) -> None:
         crear_nueva_transaccion([*usuario.keys()][0], obtener_fecha(), "Gana", str(ganancia))
     else:
         crear_nueva_transaccion([*usuario.keys()][0], obtener_fecha(), "Pierde", str(ganancia))
-
 
 def main() -> None:
     diccionario_equipos = {451: 'Boca JRS', 434: 'Gimnasia (LP)', 435: 'River Plate', 436: 'Racing Club', 437: 'Rosario Central', 438: 'Vélez Sarsfield', 439: 'Godoy cruz',
